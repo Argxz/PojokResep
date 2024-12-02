@@ -1,34 +1,55 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import ProfilePictureUpload from './uploadProfilePict'
+import { useDispatch } from 'react-redux'
+import { verifyToken } from '../redux/action/authActions' // Sesuaikan path
 
 const Profile = () => {
+  const dispatch = useDispatch()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [imageKey, setImageKey] = useState(Date.now())
 
-  // Pindahkan fetchProfile ke luar useEffect agar bisa diakses di mana pun
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token')
+      // Gunakan accessToken
+      let accessToken = localStorage.getItem('accessToken')
 
-      if (!token) {
-        throw new Error('No token found')
+      if (!accessToken) {
+        // Coba verifikasi token jika tidak ada
+        const tokenVerified = await dispatch(verifyToken())
+        if (!tokenVerified) {
+          throw new Error('Unauthorized')
+        }
+        // Ambil ulang token setelah verifikasi
+        accessToken = localStorage.getItem('accessToken')
       }
 
       const response = await axios.get(
-        'http://localhost:3001/api/v1/users/profile', // Hapus spasi di depan URL
+        'http://localhost:3001/api/v1/users/profile',
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       )
 
-      setProfile(response.data)
+      setProfile(response.data) // Sesuaikan dengan struktur response backend
       setLoading(false)
     } catch (err) {
+      console.error('Fetch Profile Error:', err)
+
+      // Jika token invalid, logout
+      if (
+        err.response &&
+        (err.response.status === 401 || err.response.status === 403)
+      ) {
+        dispatch({ type: 'LOGOUT' })
+        window.location.href = '/login'
+        return
+      }
+
       setError(err.message)
       setLoading(false)
     }
@@ -36,12 +57,10 @@ const Profile = () => {
 
   useEffect(() => {
     fetchProfile()
-  }, [])
+  }, [dispatch])
 
   const handleSuccessUpload = () => {
-    // Sekarang fetchProfile bisa dipanggil
     fetchProfile()
-    // Update key untuk memaksa refresh gambar
     setImageKey(Date.now())
   }
 

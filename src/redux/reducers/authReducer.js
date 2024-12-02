@@ -1,7 +1,8 @@
 const initialState = {
   isAuthenticated: false,
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   error: null,
   loading: true, // Default loading true
 }
@@ -13,7 +14,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: true,
         user: action.payload.user,
-        token: action.payload.token,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
         error: null,
         loading: false,
       }
@@ -22,8 +24,16 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         user: null,
-        token: null,
+        accessToken: null,
+        refreshToken: null,
         error: action.payload,
+        loading: false,
+      }
+    case 'REFRESH_TOKEN':
+      return {
+        ...state,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
         loading: false,
       }
     case 'LOGOUT':
@@ -31,7 +41,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         user: null,
-        token: null,
+        accessToken: null,
+        refreshToken: null,
         error: null,
         loading: false,
       }
@@ -45,7 +56,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: true,
         user: action.payload.user,
-        token: action.payload.token,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
         loading: false,
       }
     case 'VERIFY_TOKEN_FAILURE':
@@ -53,7 +65,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         user: null,
-        token: null,
+        accessToken: null,
+        refreshToken: null,
         loading: false,
       }
     default:

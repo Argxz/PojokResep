@@ -1,25 +1,31 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
+const BASE_URL = 'http://localhost:3001/api/v1/users'
+
 // Action Login
 export const login = (email, password) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      'http://localhost:3001/api/v1/users/login',
-      { email, password },
-    )
+    const response = await axios.post(`${BASE_URL}/login`, {
+      email,
+      password,
+    })
+
+    const { accessToken, refreshToken } = response.data.data
 
     // Dispatch login success
     dispatch({
       type: 'LOGIN_SUCCESS',
       payload: {
         user: response.data.data,
-        token: response.data.data.token,
+        accessToken,
+        refreshToken,
       },
     })
 
     // Simpan token di localStorage
-    localStorage.setItem('token', response.data.data.token)
+    localStorage.setItem('accessToken', accessToken)
+    localStorage.setItem('refreshToken', refreshToken)
 
     // Tampilkan notifikasi berhasil
     Swal.fire({
@@ -33,7 +39,6 @@ export const login = (email, password) => async (dispatch) => {
   } catch (error) {
     let errorMessage = 'Login Gagal'
 
-    // Tangani berbagai kemungkinan error
     if (error.response) {
       errorMessage =
         error.response.data?.message ||
@@ -64,17 +69,147 @@ export const login = (email, password) => async (dispatch) => {
   }
 }
 
-// Action Register
+// Action Refresh Token
+export const refreshTokenAction = (refreshToken) => async (dispatch) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/refresh-token`, {
+      refreshToken,
+    })
+
+    const { accessToken, refreshToken: newRefreshToken } = response.data
+
+    // Update token di localStorage
+    localStorage.setItem('accessToken', accessToken)
+    localStorage.setItem('refreshToken', newRefreshToken)
+
+    // Dispatch refresh token success
+    dispatch({
+      type: 'REFRESH_TOKEN',
+      payload: {
+        accessToken,
+        refreshToken: newRefreshToken,
+      },
+    })
+
+    return { accessToken, refreshToken: newRefreshToken }
+  } catch (error) {
+    // Jika refresh token gagal, logout paksa
+    dispatch(logoutUser())
+    throw error
+  }
+}
+
+// Action Logout
+export const logoutUser = () => async (dispatch) => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken')
+
+    // Kirim request logout ke backend
+    await axios.post(`${BASE_URL}/logout`, {
+      refreshToken,
+    })
+
+    // Hapus token dari localStorage
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+
+    // Dispatch logout
+    dispatch({ type: 'LOGOUT' })
+
+    // Tampilkan notifikasi
+    Swal.fire({
+      icon: 'success',
+      title: 'Logout Berhasil!',
+      text: 'Anda telah keluar dari sistem',
+      timer: 1500,
+    })
+
+    // Redirect ke halaman login
+    window.location.href = '/login'
+  } catch (error) {
+    console.error('Logout error:', error)
+
+    // Tetap lakukan logout lokal jika request gagal
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+
+    dispatch({ type: 'LOGOUT' })
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Logout',
+      text: 'Anda telah keluar dari sistem',
+      timer: 1500,
+    })
+
+    // Redirect ke halaman login
+    window.location.href = '/login'
+  }
+}
+
+// Action Verifikasi Token
+export const verifyToken = () => async (dispatch) => {
+  dispatch({ type: 'VERIFY_TOKEN_REQUEST' })
+
+  const accessToken = localStorage.getItem('accessToken')
+  const refreshToken = localStorage.getItem('refreshToken')
+
+  if (!accessToken || !refreshToken) {
+    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
+    return
+  }
+
+  try {
+    // Verifikasi access token
+    const response = await axios.get(`${BASE_URL}/verify-token`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+
+    if (response.data.valid) {
+      dispatch({
+        type: 'VERIFY_TOKEN_SUCCESS',
+        payload: {
+          user: response.data.user,
+          accessToken,
+          refreshToken,
+        },
+      })
+      return true
+    }
+
+    // Jika token expired, coba refresh
+    const refreshResponse = await dispatch(refreshTokenAction(refreshToken))
+
+    // Verifikasi ulang token baru
+    const newVerifyResponse = await axios.get(`${BASE_URL}/verify-token`, {
+      headers: { Authorization: `Bearer ${refreshResponse.accessToken}` },
+    })
+
+    dispatch({
+      type: 'VERIFY_TOKEN_SUCCESS',
+      payload: {
+        user: newVerifyResponse.data.user,
+        accessToken: refreshResponse.accessToken,
+        refreshToken: refreshResponse.refreshToken,
+      },
+    })
+
+    return true
+  } catch (error) {
+    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
+    dispatch(logoutUser())
+    return false
+  }
+}
+
+// Action Register (tetap sama)
 export const register = (username, email, password) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      'http://localhost:3001/api/v1/users/register',
-      {
-        username,
-        email,
-        password,
-      },
-    )
+    const response = await axios.post(`${BASE_URL}/register`, {
+      username,
+      email,
+      password,
+    })
 
     Swal.fire({
       icon: 'success',
@@ -92,64 +227,5 @@ export const register = (username, email, password) => async (dispatch) => {
     })
 
     throw error
-  }
-}
-
-// Logout action
-export const logoutUser = () => (dispatch) => {
-  // Hapus token dari localStorage
-  localStorage.removeItem('token')
-
-  // Dispatch logout
-  dispatch({
-    type: 'LOGOUT',
-  })
-
-  // Optional: Tampilkan notifikasi
-  Swal.fire({
-    icon: 'success',
-    title: 'Logout Berhasil!',
-    text: 'Anda telah keluar dari sistem',
-    timer: 1500,
-  })
-}
-
-// Tambahkan action untuk verifikasi token
-export const verifyToken = () => async (dispatch) => {
-  // Tandai proses verifikasi dimulai
-  dispatch({ type: 'VERIFY_TOKEN_REQUEST' })
-
-  const token = localStorage.getItem('token')
-
-  // Jika tidak ada token, langsung set tidak terautentikasi
-  if (!token) {
-    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
-    return
-  }
-
-  try {
-    // Ganti URL sesuai endpoint verify token Anda
-    const response = await axios.get(
-      'http://localhost:3001/api/v1/users/verify-token',
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    )
-
-    if (response.data.valid) {
-      dispatch({
-        type: 'VERIFY_TOKEN_SUCCESS',
-        payload: {
-          user: response.data.user,
-          token: token,
-        },
-      })
-    } else {
-      dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
-      localStorage.removeItem('token')
-    }
-  } catch (error) {
-    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
-    localStorage.removeItem('token')
   }
 }
