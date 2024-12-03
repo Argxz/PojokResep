@@ -6,7 +6,14 @@ const BASE_URL = 'http://localhost:3001/api/v1/recipes'
 const axiosInstance = setupAxiosInterceptors()
 export const createRecipe = (recipeData) => async (dispatch) => {
   try {
-    const response = await axiosInstance.post(`${BASE_URL}`, recipeData)
+    dispatch({ type: 'CREATE_RECIPE_REQUEST' })
+
+    const response = await axiosInstance.post('/recipes', recipeData)
+
+    dispatch({
+      type: 'CREATE_RECIPE_SUCCESS',
+      payload: response.data.data,
+    })
 
     Swal.fire({
       icon: 'success',
@@ -15,10 +22,13 @@ export const createRecipe = (recipeData) => async (dispatch) => {
       timer: 2000,
     })
 
-    return response.data
+    return response.data.data
   } catch (error) {
-    // Handle error
-    console.error('Error creating recipe:', error)
+    dispatch({
+      type: 'CREATE_RECIPE_FAIL',
+      payload: error.response?.data?.message || 'Recipe creation failed',
+    })
+
     throw error
   }
 }
