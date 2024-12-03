@@ -20,7 +20,47 @@ const CreateRecipe = () => {
     serving_size: '',
     difficulty_level: '',
     category_id: '',
+    image: null, // Tambahkan state untuk image
   })
+
+  const [imagePreview, setImagePreview] = useState(null)
+
+  // Tambahkan handler untuk image
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+
+    if (file) {
+      // Validasi ukuran file
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran file maksimal 5MB')
+        return
+      }
+
+      // Validasi tipe file
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/jpg',
+        'image/webp',
+      ]
+      if (!allowedTypes.includes(file.type)) {
+        alert('Hanya mendukung file JPEG, PNG, JPG, atau WebP')
+        return
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+      }))
+
+      // Preview image
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const [categories, setCategories] = useState([])
 
@@ -46,37 +86,36 @@ const CreateRecipe = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    try {
-      const recipeData = {
-        title: formData.title,
-        description: formData.description,
-        ingredients: formData.ingredients,
-        instructions: formData.instructions,
-        cooking_time: formData.cooking_time.toString(), // Konversi ke string
-        serving_size: formData.serving_size.toString(), // Konversi ke string
-        difficulty_level: formData.difficulty_level,
-        category_id: parseInt(formData.category_id),
-      }
 
-      const response = await dispatch(createRecipe(recipeData))
-      //   navigate('/recipes') // Redirect setelah berhasil
+    const formDataToSubmit = new FormData()
+
+    // Tambahkan semua field ke FormData
+    Object.keys(formData).forEach((key) => {
+      if (key === 'image' && formData[key]) {
+        formDataToSubmit.append('image', formData[key])
+      } else if (key !== 'image') {
+        formDataToSubmit.append(key, formData[key])
+      }
+    })
+    try {
+      const createdRecipe = await dispatch(createRecipe(formDataToSubmit))
+
+      // Optional: Reset form atau navigasi
+      setFormData({
+        title: '',
+        description: '',
+        ingredients: '',
+        instructions: '',
+        cooking_time: '',
+        serving_size: '',
+        difficulty_level: '',
+        category_id: '',
+        image: null,
+      })
+      setImagePreview(null)
     } catch (error) {
       console.error('Full Error:', error)
       console.error('Error Response:', error.response)
-
-      // Log detail error dari server
-      if (error.response) {
-        // Server responded with an error
-        console.error('Server Error Data:', error.response.data)
-        console.error('Server Error Status:', error.response.status)
-        console.error('Server Error Headers:', error.response.headers)
-
-        alert(
-          `Server Error: ${
-            error.response.data.message || 'Unknown server error'
-          }`,
-        )
-      }
     }
   }
 
@@ -178,6 +217,21 @@ const CreateRecipe = () => {
               </option>
             ))}
           </select>
+        </div>
+        <div>
+          <label>Recipe Image</label>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            onChange={handleImageChange}
+          />
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              style={{ maxWidth: '200px', maxHeight: '200px' }}
+            />
+          )}
         </div>
         <button type="submit" className="bg-blue-500 text-white p-2 rounded">
           Create Recipe
