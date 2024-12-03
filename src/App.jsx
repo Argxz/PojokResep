@@ -10,6 +10,8 @@ import Dashboard from './pages/Dashboard'
 import Logout from './pages/logout' // Sesuaikan dengan nama halaman logout Anda
 import Profile from './pages/Profile' // Sesuaikan dengan nama halaman profile Anda
 import ProfilePictureUpload from './pages/uploadProfilePict'
+import CreateRecipe from './pages/createRecipe'
+import RecipeList from './pages/recipeList'
 import PrivateRoute from './components/PrivateRoute'
 import setupAxiosInterceptors from './utils/axiosInterceptor'
 import { verifyToken } from './redux/action/authActions' // Sesuaikan dengan nama action Anda
@@ -44,7 +46,9 @@ function AppInitializer() {
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Logout />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="upload-picture" element={<ProfilePictureUpload />} />
+        <Route path="/recipelist" element={<RecipeList />} />
+        <Route path="/upload-recipe" element={<CreateRecipe />} />
+        <Route path="/upload-picture" element={<ProfilePictureUpload />} />
         {/* Tambahkan rute privat lainnya di sini */}
       </Route>
 

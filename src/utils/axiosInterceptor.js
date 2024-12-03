@@ -1,4 +1,3 @@
-// src/utils/axiosInterceptor.js
 import axios from 'axios'
 import { store } from '../redux/store'
 import { logoutUser, refreshTokenAction } from '../redux/action/authActions'
@@ -14,6 +13,7 @@ const setupAxiosInterceptors = () => {
   axiosInstance.interceptors.request.use(
     (config) => {
       const accessToken = localStorage.getItem('accessToken')
+      console.log('Request Token:', accessToken) // Tambahkan log
       if (accessToken) {
         config.headers['Authorization'] = `Bearer ${accessToken}`
       }
