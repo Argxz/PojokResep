@@ -113,6 +113,7 @@ const CreateRecipe = () => {
         image: null,
       })
       setImagePreview(null)
+      navigate(`/recipe/${createdRecipe.id}`)
     } catch (error) {
       console.error('Full Error:', error)
       console.error('Error Response:', error.response)
