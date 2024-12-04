@@ -1,9 +1,7 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
 const BASE_URL = 'http://localhost:3001/api/v1/users'
-const axiosInstance = setupAxiosInterceptors()
 
 // Action Login
 export const login = (email, password) => async (dispatch) => {
@@ -228,25 +226,6 @@ export const register = (username, email, password) => async (dispatch) => {
       text: error.response?.data?.message || 'Terjadi kesalahan',
     })
 
-    throw error
-  }
-}
-
-export const fetchUserProfile = () => async (dispatch) => {
-  try {
-    const response = await axiosInstance.get(`${BASE_URL}/profile`)
-
-    dispatch({
-      type: 'FETCH_PROFILE_SUCCESS',
-      payload: response.data,
-    })
-    return response.data
-  } catch (error) {
-    console.error('Profile Fetch Error:', error)
-    dispatch({
-      type: 'FETCH_PROFILE_FAILURE',
-      payload: error.response?.data || error.message,
-    })
     throw error
   }
 }

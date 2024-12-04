@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Clock, Users, ChefHat, Tag, Edit } from 'lucide-react'
-import setupAxiosInterceptors from '../utils/axiosInterceptor'
 import { fetchRecipeDetail } from '../redux/action/recipeActions'
-import { fetchUserProfile } from '../redux/action/authActions'
-
-const axiosInstance = setupAxiosInterceptors()
+import { fetchUserProfile } from '../redux/action/userActions'
 
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()

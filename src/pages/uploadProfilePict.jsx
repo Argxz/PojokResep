@@ -1,33 +1,21 @@
 import React, { useState } from 'react'
-import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { uploadProfilePicture } from '../redux/action/userActions'
+import { Camera, X } from 'lucide-react'
 
-const ProfilePictureUpload = ({ onSuccessUpload }) => {
+const ProfilePictureUpload = ({ onSuccessUpload, className = '' }) => {
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const dispatch = useDispatch()
+  const { loading, error } = useSelector((state) => state.user)
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      // Validasi tipe dan ukuran file
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg']
-      const maxSize = 5 * 1024 * 1024 // 5MB
-
-      if (!allowedTypes.includes(file.type)) {
-        setError('Hanya file JPEG, PNG, dan JPG yang diizinkan')
-        return
-      }
-
-      if (file.size > maxSize) {
-        setError('Ukuran file maksimal 5MB')
-        return
-      }
-
       setSelectedFile(file)
-      setError(null)
 
-      // Buat preview
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreview(reader.result)
@@ -37,87 +25,106 @@ const ProfilePictureUpload = ({ onSuccessUpload }) => {
   }
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      setError('Pilih file terlebih dahulu')
-      return
-    }
-
-    const formData = new FormData()
-    formData.append('profile_picture', selectedFile)
+    if (!selectedFile) return
 
     try {
-      setUploading(true)
-      setError(null)
+      await dispatch(uploadProfilePicture(selectedFile))
 
-      const token = localStorage.getItem('token')
-      const response = await axios.post(
-        `http://localhost:3001/api/v1/users/upload-profile-picture`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-
-      // Log response untuk debugging
-      console.log('Upload Response:', response.data)
-
-      // Panggil callback sukses upload dengan nama file
+      // Panggil callback jika berhasil
       if (onSuccessUpload) {
-        onSuccessUpload(response.data.profile_picture)
+        onSuccessUpload()
       }
 
       // Reset state
       setSelectedFile(null)
       setPreview(null)
-
-      alert('Foto profil berhasil diupload')
-    } catch (error) {
-      console.error('Upload failed', error.response?.data || error.message)
-      setError(error.response?.data?.message || 'Gagal mengupload foto profil')
-    } finally {
-      setUploading(false)
+      setIsModalOpen(false)
+    } catch (err) {
+      console.error('Upload failed', err)
     }
   }
 
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedFile(null)
+    setPreview(null)
+  }
+
   return (
-    <div className="max-w-md mx-auto p-4">
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/jpg"
-        onChange={handleFileChange}
-        className="mb-4"
-      />
-
-      {preview && (
-        <div className="mb-4">
-          <img
-            src={preview}
-            alt="Preview"
-            className="w-32 h-32 rounded-full object-cover mx-auto"
-          />
-        </div>
-      )}
-
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-
+    <>
+      {/* Tombol Kamera untuk Membuka Modal */}
       <button
-        onClick={handleUpload}
-        disabled={!selectedFile || uploading}
+        onClick={openModal}
         className={`
-          w-full py-2 rounded 
-          ${
-            !selectedFile || uploading
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-blue-500 text-white hover:bg-blue-600'
-          }
+          rounded-full bg-white p-2 shadow-md 
+          hover:bg-gray-100 transition-all duration-300
+          flex items-center justify-center
+          ${className}
         `}
       >
-        {uploading ? 'Mengunggah...' : 'Upload Foto Profil'}
+        <Camera className="w-5 h-5 text-blue-500" />
       </button>
-    </div>
+
+      {/* Modal Upload */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 w-96 relative">
+            {/* Tombol Tutup */}
+            <button
+              onClick={closeModal}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Upload Profile Picture
+            </h2>
+
+            {/* Input File */}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/jpg"
+              onChange={handleFileChange}
+              className="mb-4 w-full"
+            />
+
+            {/* Preview */}
+            {preview && (
+              <div className="mb-4 flex justify-center">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-48 h-48 rounded-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-500 text-center mb-4">{error}</div>
+            )}
+
+            {/* Tombol Upload */}
+            <button
+              onClick={handleUpload}
+              disabled={!selectedFile || loading}
+              className={`
+                w-full py-3 rounded-lg transition-all duration-300
+                ${
+                  !selectedFile || loading
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }
+              `}
+            >
+              {loading ? 'Uploading...' : 'Upload Photo'}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

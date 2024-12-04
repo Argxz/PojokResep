@@ -71,20 +71,6 @@ const authReducer = (state = initialState, action) => {
         refreshToken: null,
         loading: false,
       }
-    case 'FETCH_PROFILE_SUCCESS':
-      return {
-        ...state,
-        profile: action.payload,
-        isAuthenticated: true,
-        loading: false,
-      }
-    case 'FETCH_PROFILE_FAILURE':
-      return {
-        ...state,
-        profile: null,
-        isAuthenticated: false,
-        error: action.payload,
-      }
     default:
       return state
   }
