@@ -1,10 +1,12 @@
 const initialState = {
   isAuthenticated: false,
   user: null,
+  currentUser: null,
   accessToken: null,
   refreshToken: null,
   error: null,
-  loading: true, // Default loading true
+  loading: true,
+  profile: null,
 }
 
 const authReducer = (state = initialState, action) => {
@@ -68,6 +70,20 @@ const authReducer = (state = initialState, action) => {
         accessToken: null,
         refreshToken: null,
         loading: false,
+      }
+    case 'FETCH_PROFILE_SUCCESS':
+      return {
+        ...state,
+        profile: action.payload,
+        isAuthenticated: true,
+        loading: false,
+      }
+    case 'FETCH_PROFILE_FAILURE':
+      return {
+        ...state,
+        profile: null,
+        isAuthenticated: false,
+        error: action.payload,
       }
     default:
       return state

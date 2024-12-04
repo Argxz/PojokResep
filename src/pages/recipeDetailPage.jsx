@@ -1,54 +1,67 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { Clock, Users, ChefHat, Tag, Edit } from 'lucide-react'
 import setupAxiosInterceptors from '../utils/axiosInterceptor'
+import { fetchRecipeDetail } from '../redux/action/recipeActions'
+import { fetchUserProfile } from '../redux/action/authActions'
 
 const axiosInstance = setupAxiosInterceptors()
+
 const RecipeDetailPage = () => {
+  const dispatch = useDispatch()
   const { recipeId } = useParams()
-  const [recipe, setRecipe] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
+
+  const recipe = useSelector((state) => state.recipe.currentRecipe)
+  const loading = useSelector((state) => state.recipe.loading)
+  const error = useSelector((state) => state.recipe.error)
+  const currentUser = useSelector((state) => state.auth.profile)
+  const authLoading = useSelector((state) => state.auth.loading)
+  const recipeLoading = useSelector((state) => state.recipe.loading)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchRecipeDetail = async () => {
+    const fetchData = async () => {
       try {
-        // Fetch spesifik resep berdasarkan ID
-        const recipeResponse = await axiosInstance.get(
-          `http://localhost:3001/api/v1/recipes/${recipeId}`,
-        )
+        // Fetch recipe detail
+        await dispatch(fetchRecipeDetail(recipeId))
 
-        // Fetch profile user yang login
-        const userResponse = await axiosInstance.get(
-          'http://localhost:3001/api/v1/users/profile',
-        )
-
-        setRecipe(recipeResponse.data)
-        setCurrentUser(userResponse.data)
-        setLoading(false)
-      } catch (err) {
-        setError(err)
-        setLoading(false)
+        // Fetch user profile
+        await dispatch(fetchUserProfile())
+      } catch (error) {
+        console.error('Error fetching data:', error)
       }
     }
 
-    fetchRecipeDetail()
-  }, [recipeId])
+    fetchData()
+  }, [dispatch, recipeId])
+
+  const checkIsRecipeOwner = () => {
+    // Cek dengan multiple kondisi
+    const isOwnerByUsername = currentUser?.username === recipe?.user?.username
+    const isOwnerByEmail = currentUser?.email === recipe?.user?.email
+
+    const isOwner = isOwnerByUsername || isOwnerByEmail
+
+    return isOwner
+  }
+
+  const isRecipeOwner = checkIsRecipeOwner()
+
+  // Loading state
+  if (authLoading || recipeLoading) {
+    return <div>Loading...</div>
+  }
 
   // Fungsi untuk handle edit recipe
   const handleEditRecipe = () => {
-    alert('kamu bisa edit')
-    // navigate(`/recipe/edit/${recipeId}`)
+    navigate(`/recipe/edit/${recipeId}`)
   }
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
   if (!recipe) return <div>Recipe not found</div>
-
-  // Cek apakah user yang login adalah pemilik resep
-  const isRecipeOwner =
-    currentUser && recipe?.user && currentUser.username === recipe.user.username
 
   // Fungsi untuk memformat ingredients dan instructions
   const formatList = (text) => {
@@ -63,7 +76,7 @@ const RecipeDetailPage = () => {
           <img
             src={
               recipe.image_url
-                ? `http://localhost:3001/recipes/${recipe.image_url}`
+                ? `http://localhost:3001${recipe.image_url}`
                 : '/null.png'
             }
             alt={recipe.title}
@@ -105,13 +118,12 @@ const RecipeDetailPage = () => {
                 <p className="text-gray-600">Recipe Creator</p>
               </div>
             </div>
-
-            {/* Tombol Edit hanya muncul jika user adalah pemilik resep */}
+            {/* Tombol Edit */}
             {isRecipeOwner && (
               <button
                 onClick={handleEditRecipe}
                 className="flex items-center bg-blue-500 text-white 
-                px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          px-4 py-2 rounded-lg hover:bg-blue-600 transition"
               >
                 <Edit className="mr-2" /> Edit Resep
               </button>

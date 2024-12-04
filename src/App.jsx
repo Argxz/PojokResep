@@ -13,6 +13,7 @@ import ProfilePictureUpload from './pages/uploadProfilePict'
 import CreateRecipe from './pages/createRecipe'
 import RecipeList from './pages/recipeList'
 import RecipeDetailPage from './pages/recipeDetailPage' // Sesuaikan dengan nama halaman detail resep Anda
+import UpdateRecipe from './pages/updateRecipePage'
 import PrivateRoute from './components/PrivateRoute'
 import setupAxiosInterceptors from './utils/axiosInterceptor'
 import { verifyToken } from './redux/action/authActions' // Sesuaikan dengan nama action Anda
@@ -50,6 +51,7 @@ function AppInitializer() {
         <Route path="/recipe" element={<RecipeList />} />
         <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
         <Route path="/upload-recipe" element={<CreateRecipe />} />
+        <Route path="/recipe/edit/:recipeId" element={<UpdateRecipe />} />
         <Route path="/upload-picture" element={<ProfilePictureUpload />} />
         {/* Tambahkan rute privat lainnya di sini */}
       </Route>

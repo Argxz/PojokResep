@@ -45,7 +45,7 @@ const ListRecipes = () => {
                   <img
                     src={
                       recipe.image_url
-                        ? `http://localhost:3001/recipes/${recipe.image_url}`
+                        ? `http://localhost:3001${recipe.image_url}`
                         : '/null.png'
                     }
                     alt={recipe.title}

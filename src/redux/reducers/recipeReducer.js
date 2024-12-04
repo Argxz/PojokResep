@@ -38,6 +38,44 @@ const recipeReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       }
+    case 'FETCH_RECIPE_DETAIL_SUCCESS':
+      return {
+        ...state,
+        currentRecipe: action.payload,
+        loading: false,
+        error: null,
+      }
+    case 'FETCH_RECIPE_DETAIL_FAILURE':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
+
+    case 'UPDATE_RECIPE_REQUEST':
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      }
+
+    case 'UPDATE_RECIPE_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        recipes: state.recipes.map((recipe) =>
+          recipe.id === action.payload.id
+            ? { ...recipe, ...action.payload }
+            : recipe,
+        ),
+      }
+
+    case 'UPDATE_RECIPE_FAIL':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
     default:
       return state
   }
