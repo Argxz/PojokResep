@@ -47,3 +47,25 @@ export const createRecipe = (recipeData) => async (dispatch) => {
     throw error
   }
 }
+
+export const getAllRecipes = () => async (dispatch) => {
+  try {
+    dispatch({ type: 'GET_RECIPES_REQUEST' })
+
+    const response = await axiosInstance.get('/recipes')
+
+    dispatch({
+      type: 'GET_RECIPES_SUCCESS',
+      payload: response.data.data,
+    })
+
+    return response.data.data
+  } catch (error) {
+    dispatch({
+      type: 'GET_RECIPES_FAIL',
+      payload: error.response?.data?.message || 'Gagal mengambil resep',
+    })
+
+    throw error
+  }
+}

@@ -11,13 +11,14 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import authReducer from './reducers/authReducer'
+import recipeReducer from './reducers/recipeReducer' // Pastikan import reducer recipe
 
 // Konfigurasi persist
 const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['auth'], // Hanya persist reducer auth
+  whitelist: ['auth'], // Tetap hanya persist auth
 }
 
 // Buat reducer yang dipersist
@@ -25,7 +26,7 @@ const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
     auth: authReducer,
-    // reducer lain
+    recipe: recipeReducer, // Tambahkan recipe reducer
   }),
 )
 

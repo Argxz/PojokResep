@@ -1,94 +1,98 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { getAllRecipes } from '../redux/action/recipeActions'
 
-function RecipeList() {
-  const [recipes, setRecipes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+const ListRecipes = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const {
+    recipes = [],
+    loading = false,
+    error = null,
+  } = useSelector((state) => state.recipe || {})
+
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/v1/recipes')
-        setRecipes(response.data.data)
-      } catch (err) {
-        setError('Error fetching data')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRecipes()
-  }, [])
+    dispatch(getAllRecipes())
+  }, [dispatch])
+
+  const handleRecipeClick = (recipeId) => {
+    // Navigasi ke halaman detail resep
+    navigate(`/recipe/${recipeId}`)
+  }
 
   if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (error) return <div>Error: {error}</div>
+
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6 text-center">Recipes</h1>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  No
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cooking Time
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Serving Size
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Difficulty Level
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {recipes.map((recipe, index) => (
-                <tr key={recipe.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 whitespace-nowrap">{index + 1}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.title}
-                  </td>
-                  <td className="px-4 py-4">{recipe.description}</td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.user.username}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.category.name}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.cooking_time}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.serving_size}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {recipe.difficulty_level}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {recipes.length === 0 ? (
+        <div>Tidak ada resep</div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {recipes.map((recipe) => (
+            <div
+              key={recipe.id}
+              onClick={() => handleRecipeClick(recipe.id)}
+              className="bg-white rounded-lg shadow-md overflow-hidden 
+                         transition-all duration-300 ease-in-out 
+                         hover:shadow-xl hover:scale-105 
+                         cursor-pointer"
+            >
+              <div>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={
+                      recipe.image_url
+                        ? `http://localhost:3001/recipes/${recipe.image_url}`
+                        : '/null.png'
+                    }
+                    alt={recipe.title}
+                    className="w-full h-48 object-cover 
+                               transition-transform duration-300 
+                               group-hover:scale-110"
+                  />
+                  <div
+                    className="absolute inset-0 bg-black opacity-0 
+                                  group-hover:opacity-20 
+                                  transition-opacity duration-300"
+                  ></div>
+                </div>
+
+                <div className="p-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <img
+                        src={
+                          recipe.user?.profile_picture
+                            ? `http://localhost:3001/uploads/profile_pictures/${recipe.user.profile_picture}`
+                            : '/user.png'
+                        }
+                        alt={recipe.user?.username || 'User'}
+                        className="w-10 h-10 rounded-full object-cover mr-2"
+                      />
+                      <span className="text-sm">
+                        {recipe.user?.username || 'Unknown User'}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <h2 className="text-base font-bold mb-1">
+                        {recipe.title}
+                      </h2>
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">
+                        {recipe.category?.name || 'No Category'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </>
+      )}
+    </div>
   )
 }
 
-export default RecipeList
+export default ListRecipes

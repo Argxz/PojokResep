@@ -48,6 +48,11 @@ const LogoutButton = () => {
             UPLOAD
           </button>
         </Link>
+        <Link to="recipe">
+          <button className="bg-emerald-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors">
+            RESEP
+          </button>
+        </Link>
         {/* User Info */}
         <div className="flex-grow">
           <p className="font-semibold text-sm">{user?.username}</p>
