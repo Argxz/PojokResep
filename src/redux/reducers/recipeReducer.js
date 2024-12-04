@@ -1,5 +1,6 @@
 const initialState = {
   recipes: [],
+  currentRecipe: null,
   loading: false,
   error: null,
 }
@@ -71,6 +72,27 @@ const recipeReducer = (state = initialState, action) => {
       }
 
     case 'UPDATE_RECIPE_FAIL':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
+    case 'DELETE_RECIPE_REQUEST':
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      }
+
+    case 'DELETE_RECIPE_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        recipes: state.recipes.filter((recipe) => recipe.id !== action.payload),
+        currentRecipe: null, // Reset current recipe setelah dihapus
+      }
+
+    case 'DELETE_RECIPE_FAIL':
       return {
         ...state,
         loading: false,

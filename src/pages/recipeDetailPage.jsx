@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Clock, Users, ChefHat, Tag, Edit } from 'lucide-react'
-import { fetchRecipeDetail } from '../redux/action/recipeActions'
+import { Clock, Users, ChefHat, Tag, Edit, Trash2 } from 'lucide-react'
+import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
 
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()
   const { recipeId } = useParams()
 
+  const [showModal, setShowModal] = useState(false)
+
   const recipe = useSelector((state) => state.recipe.currentRecipe)
+  const authUser = useSelector((state) => state.auth.user)
+
   const loading = useSelector((state) => state.recipe.loading)
   const error = useSelector((state) => state.recipe.error)
-  const currentUser = useSelector((state) => state.auth.profile)
+
   const authLoading = useSelector((state) => state.auth.loading)
   const recipeLoading = useSelector((state) => state.recipe.loading)
 
@@ -35,13 +39,9 @@ const RecipeDetailPage = () => {
   }, [dispatch, recipeId])
 
   const checkIsRecipeOwner = () => {
-    // Cek dengan multiple kondisi
-    const isOwnerByUsername = currentUser?.username === recipe?.user?.username
-    const isOwnerByEmail = currentUser?.email === recipe?.user?.email
+    const isOwnerById = authUser?.id === recipe?.user_id
 
-    const isOwner = isOwnerByUsername || isOwnerByEmail
-
-    return isOwner
+    return isOwnerById
   }
 
   const isRecipeOwner = checkIsRecipeOwner()
@@ -54,6 +54,20 @@ const RecipeDetailPage = () => {
   // Fungsi untuk handle edit recipe
   const handleEditRecipe = () => {
     navigate(`/recipe/edit/${recipeId}`)
+  }
+
+  const handleDeleteRecipe = async () => {
+    setShowModal(true)
+  }
+
+  const confirmDelete = async () => {
+    try {
+      await dispatch(deleteRecipe(recipeId))
+      setShowModal(false)
+      navigate('/recipe')
+    } catch (error) {
+      console.error('Error deleting recipe:', error)
+    }
   }
 
   if (loading) return <div>Loading...</div>
@@ -117,13 +131,71 @@ const RecipeDetailPage = () => {
             </div>
             {/* Tombol Edit */}
             {isRecipeOwner && (
-              <button
-                onClick={handleEditRecipe}
-                className="flex items-center bg-blue-500 text-white 
-          px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-              >
-                <Edit className="mr-2" /> Edit Resep
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleEditRecipe}
+                  className="flex items-center bg-blue-500 text-white 
+        px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                >
+                  <Edit className="mr-2" /> Edit Resep
+                </button>
+                <button
+                  onClick={handleDeleteRecipe}
+                  className="flex items-center bg-red-500 text-white 
+        px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                >
+                  <Trash2 className="mr-2" /> Hapus Resep
+                </button>
+              </div>
+            )}
+            {showModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+                <div className="relative w-auto max-w-sm mx-auto my-6">
+                  <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+                    <div className="flex items-start justify-between p-5 border-b border-solid rounded-t border-blueGray-200">
+                      <h3 className="text-xl font-semibold">
+                        Konfirmasi Hapus Resep
+                      </h3>
+                      <button
+                        className="float-right p-1 ml-auto text-3xl font-semibold leading-none text-black bg-transparent border-0 outline-none opacity-5 focus:outline-none"
+                        onClick={() => setShowModal(false)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="relative flex-auto p-6">
+                      <p className="my-4 text-blueGray-500">
+                        Apakah Anda yakin ingin menghapus resep ini?
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
+                      <button
+                        className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-gray-600 uppercase 
+    transition-all duration-300 ease-in-out 
+    hover:bg-gray-100 hover:text-gray-900 
+    rounded-md"
+                        type="button"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Batal
+                      </button>
+                      <button
+                        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase 
+    bg-red-500 
+    transition-all duration-300 ease-in-out 
+    hover:bg-red-600 
+    active:bg-red-700 
+    rounded-md 
+    shadow-md hover:shadow-lg"
+                        type="button"
+                        onClick={confirmDelete}
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 

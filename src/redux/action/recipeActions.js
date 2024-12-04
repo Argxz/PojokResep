@@ -135,3 +135,39 @@ export const updateRecipe = (recipeId, formData) => async (dispatch) => {
     throw error
   }
 }
+
+export const deleteRecipe = (recipeId) => async (dispatch) => {
+  try {
+    dispatch({ type: 'DELETE_RECIPE_REQUEST' })
+
+    const response = await axiosInstance.delete(`/recipes/${recipeId}`)
+
+    dispatch({
+      type: 'DELETE_RECIPE_SUCCESS',
+      payload: recipeId,
+    })
+
+    // Optional: Tambahkan toast/notification sukses
+    Swal.fire({
+      icon: 'success',
+      title: 'Resep Berhasil Dihapus',
+      timer: 2000,
+    })
+
+    return response.data
+  } catch (error) {
+    dispatch({
+      type: 'DELETE_RECIPE_FAIL',
+      payload: error.response?.data?.message || 'Gagal menghapus resep',
+    })
+
+    // Optional: Tambahkan toast/notification error
+    Swal.fire({
+      icon: 'error',
+      title: 'Gagal Update Resep',
+      text: error.response?.data?.error || 'Terjadi kesalahan',
+    })
+
+    throw error
+  }
+}

@@ -1,5 +1,6 @@
 const initialState = {
   profilePicture: null,
+  profile: null,
   loading: false,
   error: null,
 }
