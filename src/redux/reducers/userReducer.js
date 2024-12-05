@@ -48,6 +48,28 @@ const userReducer = (state = initialState, action) => {
         profile: null,
         error: action.payload,
       }
+    case 'UPDATE_PROFILE_REQUEST':
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      }
+    case 'UPDATE_PROFILE_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        profile: {
+          ...state.profile,
+          ...action.payload,
+        },
+        error: null,
+      }
+    case 'UPDATE_PROFILE_FAILURE':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
     default:
       return state
   }

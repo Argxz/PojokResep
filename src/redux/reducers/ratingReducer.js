@@ -9,7 +9,6 @@ const initialState = {
 export const ratingReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'FETCH_RECIPE_RATINGS_SUCCESS':
-      console.log('Reducer Payload:', action.payload) // Logging
       return {
         ...state,
         ratings: action.payload, // Pastikan ini sesuai struktur data dari backend

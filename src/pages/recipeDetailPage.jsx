@@ -24,24 +24,12 @@ const RecipeDetailPage = () => {
   // Ambil ratings dari redux
   const ratings = useSelector((state) => state.rating.ratings)
 
-  // Hitung rating rata-rata
-  useEffect(() => {
-    console.log('Current Ratings:', ratings)
-  }, [ratings])
-
   const recipeRating = useMemo(() => {
-    console.log('Calculating Rating', {
-      ratings,
-      type: typeof ratings,
-      isArray: Array.isArray(ratings),
-    })
-
     // Pastikan ratings adalah array dan memiliki value
     if (!Array.isArray(ratings) || ratings.length === 0) return 0
 
     // Hitung rata-rata
     const totalRating = ratings.reduce((sum, rating) => {
-      console.log('Rating Value:', rating.value)
       return sum + rating.value
     }, 0)
 

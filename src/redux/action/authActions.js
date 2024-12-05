@@ -220,19 +220,67 @@ export const register = (username, email, password) => async (dispatch) => {
 
     return response.data.data
   } catch (error) {
-    // Tambahkan pengecekan spesifik untuk error 409
-    if (error.response && error.response.status === 409) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Registrasi Gagal',
-        text: error.response.data.error || 'Email sudah terdaftar',
-      })
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Registrasi Gagal',
-        text: error.response?.data?.message || 'Terjadi kesalahan',
-      })
+    // Penanganan error yang lebih detail
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          // Error validasi
+          const validationErrors =
+            error.response.data.details || error.response.data.error
+
+          // Cek error spesifik
+          if (typeof validationErrors === 'string') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Validasi Gagal',
+              text: validationErrors,
+            })
+          } else if (Array.isArray(validationErrors)) {
+            // Jika error adalah array, ambil pesan pertama
+            Swal.fire({
+              icon: 'error',
+              title: 'Validasi Gagal',
+              text: validationErrors[0],
+            })
+          } else if (typeof validationErrors === 'object') {
+            // Jika error adalah object, cari pesan error
+            const errorMessage = Object.values(validationErrors)[0]
+            Swal.fire({
+              icon: 'error',
+              title: 'Validasi Gagal',
+              text: errorMessage,
+            })
+          }
+          break
+
+        case 409:
+          // Conflict error (email/username sudah ada)
+          Swal.fire({
+            icon: 'error',
+            title: 'Registrasi Gagal',
+            text:
+              error.response.data.error ||
+              'Email atau username sudah terdaftar',
+          })
+          break
+
+        case 500:
+          // Server error
+          Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan Saat Registrasi',
+            text: 'Pastikan Username / Email belum terdaftar dan password menggunakan nomor',
+          })
+          break
+
+        default:
+          // Error umum
+          Swal.fire({
+            icon: 'error',
+            title: 'Registrasi Gagal',
+            text: error.response.data.message || 'Terjadi kesalahan',
+          })
+      }
     }
 
     throw error

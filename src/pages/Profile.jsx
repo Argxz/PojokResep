@@ -1,12 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchUserProfile } from '../redux/action/userActions'
+import {
+  fetchUserProfile,
+  updateUsernameEmail,
+} from '../redux/action/userActions'
 import ProfilePictureUpload from './uploadProfilePict'
-import { User, Mail, Image, Edit2, Settings, Shield } from 'lucide-react'
+import {
+  User,
+  Mail,
+  Image,
+  Edit2,
+  Settings,
+  Shield,
+  X,
+  Check,
+} from 'lucide-react'
 
 const Profile = () => {
   const dispatch = useDispatch()
   const [imageKey, setImageKey] = useState(Date.now())
+
+  // Deklarasi state untuk edit mode
+  const [isEditingUsername, setIsEditingUsername] = useState(false)
+  const [isEditingEmail, setIsEditingEmail] = useState(false)
+
+  // State untuk input sementara
+  const [editUsername, setEditUsername] = useState('')
+  const [editEmail, setEditEmail] = useState('')
 
   const { profile, loading, error } = useSelector((state) => state.user)
 
@@ -17,6 +37,35 @@ const Profile = () => {
   const handleSuccessUpload = () => {
     dispatch(fetchUserProfile())
     setImageKey(Date.now())
+  }
+  // Fungsi untuk memulai edit
+  const startEditUsername = () => {
+    setEditUsername(profile.username)
+    setIsEditingUsername(true)
+  }
+
+  const startEditEmail = () => {
+    setEditEmail(profile.email)
+    setIsEditingEmail(true)
+  }
+
+  // Fungsi untuk submit update
+  const handleUpdateUsername = async () => {
+    try {
+      await dispatch(updateUsernameEmail(editUsername, null))
+      setIsEditingUsername(false)
+    } catch (err) {
+      // Error sudah ditangani di action
+    }
+  }
+
+  const handleUpdateEmail = async () => {
+    try {
+      await dispatch(updateUsernameEmail(null, editEmail))
+      setIsEditingEmail(false)
+    } catch (err) {
+      // Error sudah ditangani di action
+    }
   }
 
   if (loading)
@@ -31,6 +80,7 @@ const Profile = () => {
       </div>
     )
 
+  // Render error
   if (error)
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -47,7 +97,6 @@ const Profile = () => {
     )
 
   if (!profile) return null
-
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -106,20 +155,82 @@ const Profile = () => {
                 <div>
                   <label className="text-sm text-slate-500">Username</label>
                   <div className="flex items-center space-x-2 mt-1">
-                    <User className="w-5 h-5 text-blue-400" />
-                    <p className="font-medium text-slate-700">
-                      {profile.username}
-                    </p>
+                    {isEditingUsername ? (
+                      <>
+                        <input
+                          type="text"
+                          value={editUsername}
+                          onChange={(e) => setEditUsername(e.target.value)}
+                          className="flex-grow border rounded-lg p-2"
+                        />
+                        <button
+                          onClick={handleUpdateUsername}
+                          className="text-green-500 hover:bg-green-100 p-1 rounded-full"
+                        >
+                          <Check className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setIsEditingUsername(false)}
+                          className="text-red-500 hover:bg-red-100 p-1 rounded-full"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <User className="w-5 h-5 text-blue-400" />
+                        <p className="font-medium text-slate-700">
+                          {profile.username}
+                        </p>
+                        <button
+                          onClick={startEditUsername}
+                          className="ml-2 text-blue-500 hover:bg-blue-100 p-1 rounded-full"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm text-slate-500">Email</label>
                   <div className="flex items-center space-x-2 mt-1">
-                    <Mail className="w-5 h-5 text-green-400" />
-                    <p className="font-medium text-slate-700">
-                      {profile.email}
-                    </p>
+                    {isEditingEmail ? (
+                      <>
+                        <input
+                          type="email"
+                          value={editEmail}
+                          onChange={(e) => setEditEmail(e.target.value)}
+                          className="flex-grow border rounded-lg p-2"
+                        />
+                        <button
+                          onClick={handleUpdateEmail}
+                          className="text-green-500 hover:bg-green-100 p-1 rounded-full"
+                        >
+                          <Check className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setIsEditingEmail(false)}
+                          className="text-red-500 hover:bg-red-100 p-1 rounded-full"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-5 h-5 text-green-400" />
+                        <p className="font-medium text-slate-700">
+                          {profile.email}
+                        </p>
+                        <button
+                          onClick={startEditEmail}
+                          className="ml-2 text-blue-500 hover:bg-blue-100 p-1 rounded-full"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

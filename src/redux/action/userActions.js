@@ -96,3 +96,67 @@ export const fetchUserProfile = () => async (dispatch) => {
     throw error
   }
 }
+
+export const updateUsernameEmail = (username, email) => async (dispatch) => {
+  try {
+    dispatch({ type: 'UPDATE_PROFILE_REQUEST' })
+
+    const response = await axiosInstance.put(`${BASE_URL}/profile`, {
+      username,
+      email,
+    })
+
+    // Dispatch success action dan update profile
+    dispatch({
+      type: 'UPDATE_PROFILE_SUCCESS',
+      payload: response.data.data,
+    })
+
+    // Tampilkan pesan sukses
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil',
+      text: response.data.message || 'Profil berhasil diupdate',
+      timer: 2000,
+    })
+
+    return response.data.data
+  } catch (error) {
+    console.error('Update Profile Error:', error)
+
+    // Tangani error spesifik
+    let errorMessage = 'Gagal update profil'
+
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          errorMessage = error.response.data.details || 'Validasi data gagal'
+          break
+        case 409:
+          errorMessage =
+            error.response.data.error || 'Username/email sudah digunakan'
+          break
+        case 500:
+          errorMessage = 'Terjadi kesalahan server'
+          break
+        default:
+          errorMessage = error.response.data.error || 'Gagal update profil'
+      }
+    }
+
+    // Dispatch error action
+    dispatch({
+      type: 'UPDATE_PROFILE_FAILURE',
+      payload: errorMessage,
+    })
+
+    // Tampilkan pesan error
+    Swal.fire({
+      icon: 'error',
+      title: 'Update Gagal',
+      text: errorMessage,
+    })
+
+    throw error
+  }
+}

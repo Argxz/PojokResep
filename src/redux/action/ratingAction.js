@@ -94,8 +94,6 @@ export const fetchRecipeRatings = (recipeId) => async (dispatch) => {
   try {
     const response = await axiosInstance.get(`${BASE_URL}/recipes/${recipeId}`)
 
-    console.log('API Response:', response.data) // Tambahkan logging
-
     dispatch({
       type: 'FETCH_RECIPE_RATINGS_SUCCESS',
       payload: response.data, // Kirim seluruh data dari response
