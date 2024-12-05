@@ -78,7 +78,7 @@ const CommentSection = ({ recipeId }) => {
   }
 
   return (
-    <div className="bg-white border-l-4 border-blue-500 rounded-lg shadow-lg p-6">
+    <div className="bg-white border-r-4 border-blue-500 rounded-lg shadow-lg p-6">
       <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
         <MessageCircle className="mr-3 text-blue-500" />
         Komentar
@@ -158,7 +158,7 @@ const CommentSection = ({ recipeId }) => {
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="bg-gray-50 p-4 rounded-lg border-l-4 
+              className="bg-gray-50 p-4 rounded-lg border-r-4 
               border-blue-400 hover:shadow-md transition duration-300"
             >
               <div className="flex items-center mb-2">
