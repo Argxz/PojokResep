@@ -1,35 +1,61 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Clock, Users, ChefHat, Tag, Edit, Trash2 } from 'lucide-react'
+import { Clock, Users, ChefHat, Utensils, Edit, Trash2 } from 'lucide-react'
 import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
+import { fetchRecipeRatings } from '../redux/action/ratingAction'
 import CommentSection from './commentSection'
+import StarRating from './starRating'
 
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()
   const { recipeId } = useParams()
+  const navigate = useNavigate()
 
   const [showModal, setShowModal] = useState(false)
 
   const recipe = useSelector((state) => state.recipe.currentRecipe)
   const authUser = useSelector((state) => state.auth.user)
-
   const error = useSelector((state) => state.recipe.error)
-
   const authLoading = useSelector((state) => state.auth.loading)
   const recipeLoading = useSelector((state) => state.recipe.loading)
 
-  const navigate = useNavigate()
+  // Ambil ratings dari redux
+  const ratings = useSelector((state) => state.rating.ratings)
+
+  // Hitung rating rata-rata
+  useEffect(() => {
+    console.log('Current Ratings:', ratings)
+  }, [ratings])
+
+  const recipeRating = useMemo(() => {
+    console.log('Calculating Rating', {
+      ratings,
+      type: typeof ratings,
+      isArray: Array.isArray(ratings),
+    })
+
+    // Pastikan ratings adalah array dan memiliki value
+    if (!Array.isArray(ratings) || ratings.length === 0) return 0
+
+    // Hitung rata-rata
+    const totalRating = ratings.reduce((sum, rating) => {
+      console.log('Rating Value:', rating.value)
+      return sum + rating.value
+    }, 0)
+
+    const avgRating = totalRating / ratings.length
+
+    return avgRating
+  }, [ratings])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch recipe detail
         await dispatch(fetchRecipeDetail(recipeId))
-
-        // Fetch user profile
         await dispatch(fetchUserProfile())
+        await dispatch(fetchRecipeRatings(recipeId))
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -39,7 +65,6 @@ const RecipeDetailPage = () => {
   }, [dispatch, recipeId])
 
   const checkIsRecipeOwner = () => {
-    // Tambahkan pengecekan tambahan untuk menghindari error
     return authUser && recipe && authUser.id === recipe.user_id
   }
 
@@ -55,7 +80,7 @@ const RecipeDetailPage = () => {
     navigate(`/recipe/edit/${recipeId}`)
   }
 
-  const handleDeleteRecipe = async () => {
+  const handleDeleteRecipe = () => {
     setShowModal(true)
   }
 
@@ -74,7 +99,6 @@ const RecipeDetailPage = () => {
 
   // Fungsi untuk memformat ingredients dan instructions
   const formatList = (text) => {
-    // Tambahkan pengecekan jika text null/undefined
     if (!text) return []
     return text.split('\n').filter((item) => item.trim() !== '')
   }
@@ -97,15 +121,15 @@ const RecipeDetailPage = () => {
             />
             <div
               className="absolute inset-0 
-            bg-gradient-to-b from-transparent to-black/70 
-            rounded-lg opacity-100 group-hover:opacity-0 
-            transition-opacity duration-300 
-            flex items-end p-6"
+              bg-gradient-to-b from-transparent to-black/70 
+              rounded-lg opacity-100 group-hover:opacity-0 
+              transition-opacity duration-300 
+              flex items-end p-6"
             >
               <h1
                 className="text-3xl font-bold text-white 
-              shadow-lg shadow-black/50 
-              backdrop-blur-sm bg-white/15 p-3 rounded-lg"
+                shadow-lg shadow-black/50 
+                backdrop-blur-sm bg-white/15 p-3 rounded-lg"
               >
                 {recipe.title}
               </h1>
@@ -129,22 +153,40 @@ const RecipeDetailPage = () => {
                 <div>
                   <p className="font-semibold">{recipe.user?.username}</p>
                   <p className="text-gray-600">Recipe Creator</p>
+                  {/* Tampilkan rating rata-rata */}
+                  <div className="flex items-center">
+                    <StarRating
+                      value={recipeRating || 0}
+                      editable={authUser && authUser.id !== recipe.user_id}
+                      recipeId={recipeId}
+                      className="text-amber-500 hover:text-amber-600 transition-colors"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-700 font-semibold">
+                      ({(recipeRating || 0).toFixed(1)}
+                    </span>
+                    <span className="text-gray-500 text-sm">
+                      / 5) · {ratings.length} Rating
+                    </span>
+                  </div>
                 </div>
               </div>
+
               {/* Tombol Edit */}
               {isRecipeOwner && (
                 <div className="flex space-x-2">
                   <button
                     onClick={handleEditRecipe}
                     className="flex items-center bg-blue-500 text-white 
-        px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                    px-4 py-2 rounded-lg hover:bg-blue-600 transition"
                   >
                     <Edit className="mr-2" /> Edit Resep
                   </button>
                   <button
                     onClick={handleDeleteRecipe}
                     className="flex items-center bg-red-500 text-white 
-        px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                    px-4 py-2 rounded-lg hover:bg-red-600 transition"
                   >
                     <Trash2 className="mr-2" /> Hapus Resep
                   </button>
@@ -216,7 +258,7 @@ const RecipeDetailPage = () => {
                 <span>{recipe.difficulty_level}</span>
               </div>
               <div className="flex items-center">
-                <Tag className="mr-2 text-purple-500" />
+                <Utensils className="mr-2 text-purple-500" />
                 <span>{recipe.category?.name || 'No Category'}</span>
               </div>
             </div>

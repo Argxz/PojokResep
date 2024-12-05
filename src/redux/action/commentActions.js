@@ -23,7 +23,14 @@ export const createComment =
 
       // Refresh comments setelah membuat komentar
       dispatch(fetchCommentsByRecipeId(recipeId))
-
+      Swal.fire({
+        icon: 'success',
+        title: 'Comment berhasil disubmit',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+      })
       return response.data
     } catch (error) {
       Swal.fire({

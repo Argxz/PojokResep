@@ -14,6 +14,7 @@ import authReducer from './reducers/authReducer'
 import recipeReducer from './reducers/recipeReducer'
 import userReducer from './reducers/userReducer'
 import { commentReducer } from './reducers/commentReducer'
+import { ratingReducer } from './reducers/ratingReducer'
 
 // Konfigurasi persist
 const persistConfig = {
@@ -31,6 +32,7 @@ const persistedReducer = persistReducer(
     recipe: recipeReducer,
     user: userReducer,
     comment: commentReducer,
+    rating: ratingReducer,
   }),
 )
 
