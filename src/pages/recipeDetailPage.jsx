@@ -93,7 +93,7 @@ const RecipeDetailPage = () => {
                   : '/null.png'
               }
               alt={recipe.title}
-              className="w-full h-96 object-cover rounded-lg"
+              className="w-full h-[450px] md:h-[500px] lg:h-[600px] object-contain bg-gray-100 rounded-lg"
             />
             <div
               className="absolute inset-0 
