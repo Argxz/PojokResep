@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Edit, Trash2 } from 'lucide-react'
+import {
+  Edit,
+  Trash2,
+  MessageCircle,
+  Send,
+  Save,
+  X,
+  LogIn,
+  MessageSquare,
+} from 'lucide-react'
 import {
   createComment,
   fetchCommentsByRecipeId,
@@ -69,31 +78,40 @@ const CommentSection = ({ recipeId }) => {
   }
 
   return (
-    <div className="mt-8 bg-gray-50 p-6 rounded-lg">
-      <h3 className="text-2xl font-semibold mb-4">Komentar</h3>
+    <div className="bg-white border-l-4 border-blue-500 rounded-lg shadow-lg p-6">
+      <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+        <MessageCircle className="mr-3 text-blue-500" />
+        Komentar
+      </h3>
 
       {/* Form Komentar */}
       {authUser ? (
         <form
           onSubmit={editingComment ? handleUpdateComment : handleSubmitComment}
-          className="mb-6"
+          className="mb-6 relative"
         >
           <textarea
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder="Tulis komentar Anda..."
-            className="w-full p-3 border rounded-lg"
+            className="w-full p-4 pr-12 border-2 border-gray-200 
+            rounded-lg focus:outline-none focus:border-blue-500 
+            transition duration-300 resize-none"
             rows="4"
             maxLength={500}
           />
-          <div className="flex space-x-2 mt-2">
+          <span className="absolute bottom-2 right-4 text-gray-400">
+            {commentContent.length}/500
+          </span>
+          <div className="flex space-x-2 mt-3">
             {editingComment ? (
               <>
                 <button
                   type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                  className="bg-green-500 text-white px-4 py-2 
+                  rounded-lg hover:bg-green-600 transition flex items-center"
                 >
-                  Simpan Perubahan
+                  <Save className="mr-2" /> Simpan
                 </button>
                 <button
                   type="button"
@@ -101,36 +119,47 @@ const CommentSection = ({ recipeId }) => {
                     setEditingComment(null)
                     setCommentContent('')
                   }}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                  className="bg-gray-200 text-gray-700 px-4 py-2 
+                  rounded-lg hover:bg-gray-300 transition flex items-center"
                 >
-                  Batal
+                  <X className="mr-2" /> Batal
                 </button>
               </>
             ) : (
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                className="bg-blue-500 text-white px-4 py-2 
+                rounded-lg hover:bg-blue-600 transition flex items-center"
               >
-                Kirim Komentar
+                <Send className="mr-2" /> Kirim Komentar
               </button>
             )}
           </div>
         </form>
       ) : (
-        <p className="text-gray-600">Silakan login untuk membuat komentar</p>
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+          <p className="text-yellow-700">
+            <LogIn className="inline mr-2" />
+            Silakan login untuk membuat komentar
+          </p>
+        </div>
       )}
 
       {/* Daftar Komentar */}
-      <div className="space-y-4">
+      <div className="space-y-4 mt-6">
         {comments.length === 0 ? (
-          <p className="text-gray-500">
-            {commentMessage || 'Belum ada komentar'}
-          </p>
+          <div className="text-center bg-gray-100 p-6 rounded-lg">
+            <MessageSquare className="mx-auto mb-3 text-gray-400" size={48} />
+            <p className="text-gray-500">
+              {commentMessage || 'Belum ada komentar'}
+            </p>
+          </div>
         ) : (
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="bg-white p-4 rounded-lg shadow-md relative"
+              className="bg-gray-50 p-4 rounded-lg border-l-4 
+              border-blue-400 hover:shadow-md transition duration-300"
             >
               <div className="flex items-center mb-2">
                 <img
@@ -140,26 +169,33 @@ const CommentSection = ({ recipeId }) => {
                       : '/user.png'
                   }
                   alt={comment.user?.username}
-                  className="w-8 h-8 rounded-full mr-3"
+                  className="w-10 h-10 rounded-full mr-3 border-2 border-blue-200"
                 />
-                <span className="font-semibold">{comment.user?.username}</span>
+                <div>
+                  <span className="font-semibold text-gray-800">
+                    {comment.user?.username}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-2">
+                    {/* Tambahkan waktu komentar jika ada */}
+                  </span>
+                </div>
               </div>
-              <p>{comment.content}</p>
+              <p className="text-gray-700">{comment.content}</p>
 
               {/* Tombol Edit dan Delete */}
               {authUser && authUser.id === comment.user_id && (
-                <div className="absolute top-4 right-4 flex space-x-2">
+                <div className="flex space-x-2 mt-2 justify-end">
                   <button
                     onClick={() => handleEditComment(comment)}
-                    className="text-blue-500 hover:text-blue-600"
+                    className="text-blue-500 hover:bg-blue-100 p-1 rounded"
                   >
-                    <Edit size={20} />
+                    <Edit size={18} />
                   </button>
                   <button
                     onClick={() => handleDeleteComment(comment.id)}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-red-500 hover:bg-red-100 p-1 rounded"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               )}
