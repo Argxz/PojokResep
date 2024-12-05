@@ -13,6 +13,7 @@ import storage from 'redux-persist/lib/storage'
 import authReducer from './reducers/authReducer'
 import recipeReducer from './reducers/recipeReducer'
 import userReducer from './reducers/userReducer'
+import { commentReducer } from './reducers/commentReducer'
 
 // Konfigurasi persist
 const persistConfig = {
@@ -29,6 +30,7 @@ const persistedReducer = persistReducer(
     auth: authReducer,
     recipe: recipeReducer,
     user: userReducer,
+    comment: commentReducer,
   }),
 )
 

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Clock, Users, ChefHat, Tag, Edit, Trash2 } from 'lucide-react'
 import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
+import CommentSection from './commentSection'
 
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()
@@ -262,6 +263,7 @@ const RecipeDetailPage = () => {
           </div>
         </div>
       </div>
+      <CommentSection recipeId={recipeId} />
     </div>
   )
 }
