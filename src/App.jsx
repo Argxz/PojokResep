@@ -12,7 +12,8 @@ import Profile from './pages/Profile' // Sesuaikan dengan nama halaman profile A
 import ProfilePictureUpload from './pages/uploadProfilePict'
 import CreateRecipe from './pages/createRecipe'
 import RecipeList from './pages/recipeList'
-import RecipeDetailPage from './pages/recipeDetailPage' // Sesuaikan dengan nama halaman detail resep Anda
+import RecipeDetailPage from './pages/recipeDetailPage'
+import UserRecipes from './pages/userRecipes'
 import UpdateRecipe from './pages/updateRecipePage'
 import PrivateRoute from './components/PrivateRoute'
 import setupAxiosInterceptors from './utils/axiosInterceptor'
@@ -50,6 +51,7 @@ function AppInitializer() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/recipe" element={<RecipeList />} />
         <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
+        <Route path="/recipe/user/:userId" element={<UserRecipes />} />
         <Route path="/upload-recipe" element={<CreateRecipe />} />
         <Route path="/recipe/edit/:recipeId" element={<UpdateRecipe />} />
         <Route path="/upload-picture" element={<ProfilePictureUpload />} />

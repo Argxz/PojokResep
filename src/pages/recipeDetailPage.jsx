@@ -5,6 +5,7 @@ import { Clock, Users, ChefHat, Utensils, Edit, Trash2 } from 'lucide-react'
 import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
 import { fetchRecipeRatings } from '../redux/action/ratingAction'
+import { Typography, Box, CircularProgress } from '@mui/material'
 import CommentSection from './commentSection'
 import StarRating from './starRating'
 
@@ -59,8 +60,29 @@ const RecipeDetailPage = () => {
   const isRecipeOwner = checkIsRecipeOwner()
 
   // Loading state
-  if (authLoading || recipeLoading) {
-    return <div>Loading...</div>
+  if (authLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
+  if (recipeLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    )
   }
 
   // Fungsi untuk handle edit recipe
@@ -82,7 +104,13 @@ const RecipeDetailPage = () => {
     }
   }
 
-  if (error) return <div>Error: {error.message}</div>
+  if (error) {
+    return (
+      <Typography variant="h6" color="error" align="center">
+        {error}
+      </Typography>
+    )
+  }
   if (!recipe) return <div>Recipe not found</div>
 
   // Fungsi untuk memformat ingredients dan instructions

@@ -10,6 +10,7 @@ const LogoutButton = () => {
   const [showConfirm, setShowConfirm] = useState(false)
 
   const { user } = useSelector((state) => state.auth)
+  const userId = user?.id
 
   const imageKey = user?.profile_picture || 'default'
 
@@ -26,7 +27,7 @@ const LogoutButton = () => {
   }
 
   return (
-    <div className="bg-white shadow-xl rounded-3xl p-6 max-w-xl w-full mx-auto">
+    <div className="bg-white shadow-xl rounded-3xl p-6 max-w-3xl md:max-w-4xl w-full mx-auto">
       <div className="flex items-center space-x-6">
         {/* Profile Picture */}
         <Link to="/profile" className="flex-shrink-0">
@@ -56,6 +57,12 @@ const LogoutButton = () => {
             <button className="bg-emerald-500 text-white px-4 py-3 rounded-xl flex items-center space-x-3 hover:bg-emerald-600 transition-colors transform active:scale-95">
               <BookOpen className="w-6 h-6" />
               <span className="text-base">Daftar Resep</span>
+            </button>
+          </Link>
+          <Link to={`/recipe/user/${userId}`}>
+            <button className="bg-blue-500 text-white px-4 py-3 rounded-xl flex items-center space-x-3 hover:bg-emerald-600 transition-colors transform active:scale-95">
+              <BookOpen className="w-6 h-6" />
+              <span className="text-base">Daftar Resep User</span>
             </button>
           </Link>
         </div>

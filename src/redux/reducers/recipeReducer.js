@@ -98,6 +98,26 @@ const recipeReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       }
+    case 'FETCH_USER_RECIPES_REQUEST':
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      }
+    case 'FETCH_USER_RECIPES_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        recipes: action.payload,
+        error: null,
+      }
+    case 'FETCH_USER_RECIPES_FAIL':
+      return {
+        ...state,
+        loading: false,
+        recipes: [],
+        error: action.payload,
+      }
     default:
       return state
   }

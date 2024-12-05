@@ -171,3 +171,28 @@ export const deleteRecipe = (recipeId) => async (dispatch) => {
     throw error
   }
 }
+
+export const fetchUserRecipes = () => async (dispatch, getState) => {
+  try {
+    const { auth } = getState()
+    const userId = auth.user?.id // Tambah optional chaining
+
+    const response = await axiosInstance.get(`${BASE_URL}/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+      },
+    })
+
+    dispatch({
+      type: 'FETCH_USER_RECIPES_SUCCESS',
+      payload: response.data,
+    })
+  } catch (error) {
+    console.error('Error fetching user recipes:', error)
+    dispatch({
+      type: 'FETCH_USER_RECIPES_FAILURE',
+      payload: error.response?.data || error.message,
+    })
+    throw error
+  }
+}
