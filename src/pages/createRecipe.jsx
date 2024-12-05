@@ -197,9 +197,9 @@ const CreateRecipe = () => {
             required
           >
             <option value="">Select Difficulty</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
+            <option value="Mudah">Mudah</option>
+            <option value="Menengah">Menengah</option>
+            <option value="Sulit">Sulit</option>
           </select>
         </div>
         <div>
