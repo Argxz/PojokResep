@@ -220,11 +220,20 @@ export const register = (username, email, password) => async (dispatch) => {
 
     return response.data.data
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Registrasi Gagal',
-      text: error.response?.data?.message || 'Terjadi kesalahan',
-    })
+    // Tambahkan pengecekan spesifik untuk error 409
+    if (error.response && error.response.status === 409) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: error.response.data.error || 'Email sudah terdaftar',
+      })
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: error.response?.data?.message || 'Terjadi kesalahan',
+      })
+    }
 
     throw error
   }

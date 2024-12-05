@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { login, register } from '../redux/action/authActions'
 import { useNavigate } from 'react-router-dom'
 import LogoImage from '../assets/porespth.png'
+import SmallLogo from '../assets/pores-sm2.png'
 import Swal from 'sweetalert2'
 import { Mail, Lock, User, KeyRound } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -27,7 +28,6 @@ const Dashboard = () => {
       console.error('Login error:', error)
     }
   }
-
   const handleRegister = async (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
     try {
       await dispatch(register(username, email, password))
-      setActiveTab('login') // Pindah ke tab login setelah registrasi
+      setActiveTab('login')
     } catch (error) {
       console.error('Register error:', error)
     }
@@ -74,16 +74,24 @@ const Dashboard = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-10 border border-gray-100">
+        <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-10 border border-gray-100 ">
+          {/* Logo Section */}
+          <div className="flex justify-center mb-6">
+            <img
+              src={SmallLogo}
+              alt="Logo"
+              className="w-20 h-20 object-contain"
+            />
+          </div>
           {/* Header */}
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-gray-900">
-              {activeTab === 'login' ? 'Welcome Back' : 'Get Started'}
+              {activeTab === 'login' ? 'Selamat Datang' : 'Daftar Sekarang'}
             </h1>
             <p className="text-gray-600 mt-2">
               {activeTab === 'login'
-                ? 'Login to continue your journey'
-                : 'Create your account'}
+                ? 'Masuk untuk melanjutkan perjalanan Anda'
+                : 'Buat akun Anda'}
             </p>
           </div>
 
@@ -236,12 +244,12 @@ const Dashboard = () => {
               />
             </div>
             <h2 className="text-3xl font-bold mb-4 text-white">
-              {activeTab === 'login' ? 'New Here?' : 'Already Registered?'}
+              {activeTab === 'login' ? 'Baru di sini?' : 'Sudah terdaftar?'}
             </h2>
             <p className="mb-6 text-white/80">
               {activeTab === 'login'
-                ? 'Sign up and start your journey with us today!'
-                : 'Log in to access your personal dashboard'}
+                ? 'Daftar dan mulai perjalanan Anda bersama kami!'
+                : 'Masuk untuk mengakses dashboard pribadi Anda.'}
             </p>
             <button
               onClick={() =>
