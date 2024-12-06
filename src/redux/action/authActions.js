@@ -1,10 +1,40 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
-const BASE_URL = 'http://localhost:3001/api/v1/users'
+const BASE_URL = import.meta.env.VITE_USER_URL
 
 // Action Login
 export const login = (email, password) => async (dispatch) => {
+  // Validasi frontend sebelum request
+  if (!email) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Email wajib diisi',
+    })
+    return
+  }
+
+  // Validasi format email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Format email tidak valid',
+    })
+    return
+  }
+
+  if (!password) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Password wajib diisi',
+    })
+    return
+  }
+
   try {
     const response = await axios.post(`${BASE_URL}/login`, {
       email,
@@ -28,22 +58,44 @@ export const login = (email, password) => async (dispatch) => {
     localStorage.setItem('refreshToken', refreshToken)
 
     // Tampilkan notifikasi berhasil
-    Swal.fire({
+    await Swal.fire({
       icon: 'success',
       title: 'Login Berhasil!',
       text: `Selamat datang, ${response.data.data.username}`,
       timer: 2000,
+      showConfirmButton: false,
     })
 
     return response.data.data
   } catch (error) {
+    console.log('Full Login Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    })
+
     let errorMessage = 'Login Gagal'
+    let errorTitle = 'Login Gagal'
 
     if (error.response) {
-      errorMessage =
-        error.response.data?.message ||
-        error.response.data?.error ||
-        'Login Gagal'
+      switch (error.response.status) {
+        case 400:
+          errorMessage = error.response.data.error || 'Data login tidak valid'
+          break
+        case 401:
+        case 404:
+          errorMessage =
+            error.response.data.error || 'Email atau password salah'
+          break
+        case 500:
+          errorMessage = 'Masalah server. Coba lagi nanti'
+          break
+        default:
+          errorMessage =
+            error.response.data?.message ||
+            error.response.data?.error ||
+            'Login Gagal'
+      }
     } else if (error.request) {
       errorMessage = 'Tidak ada respon dari server'
     } else {
@@ -57,9 +109,9 @@ export const login = (email, password) => async (dispatch) => {
     })
 
     // Tampilkan notifikasi error
-    Swal.fire({
+    await Swal.fire({
       icon: 'error',
-      title: 'Login Gagal',
+      title: errorTitle,
       text: errorMessage,
       confirmButtonColor: '#3085d6',
       confirmButtonText: 'Coba Lagi',
@@ -115,17 +167,6 @@ export const logoutUser = () => async (dispatch) => {
 
     // Dispatch logout
     dispatch({ type: 'LOGOUT' })
-
-    // Tampilkan notifikasi
-    Swal.fire({
-      icon: 'success',
-      title: 'Logout Berhasil!',
-      text: 'Anda telah keluar dari sistem',
-      timer: 1500,
-    })
-
-    // Redirect ke halaman login
-    window.location.href = '/login'
   } catch (error) {
     console.error('Logout error:', error)
 
@@ -204,6 +245,35 @@ export const verifyToken = () => async (dispatch) => {
 
 // Action Register (tetap sama)
 export const register = (username, email, password) => async (dispatch) => {
+  // Validasi di frontend
+  if (username.length < 3) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Username minimal 3 karakter',
+    })
+    throw new Error('Username terlalu pendek')
+  }
+
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Format email tidak valid',
+    })
+    throw new Error('Email tidak valid')
+  }
+
+  // Pastikan password mengandung angka dan huruf
+  if (!/^(?=.*[a-z])(?=.*\d).{8,}$/.test(password)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validasi Gagal',
+      text: 'Password harus mengandung huruf dan angka',
+    })
+    throw new Error('Password tidak memenuhi kriteria')
+  }
+
   try {
     const response = await axios.post(`${BASE_URL}/register`, {
       username,
@@ -211,78 +281,88 @@ export const register = (username, email, password) => async (dispatch) => {
       password,
     })
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Registrasi Berhasil!',
-      text: 'Silakan login dengan akun Anda',
-      timer: 2000,
-    })
-
+    // Kembalikan data user
     return response.data.data
   } catch (error) {
-    // Penanganan error yang lebih detail
+    // Logging error secara detail
+    console.error('Registration Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    })
+
+    // Tangani berbagai jenis error dengan Swal
     if (error.response) {
       switch (error.response.status) {
         case 400:
-          // Error validasi
-          const validationErrors =
-            error.response.data.details || error.response.data.error
+          // Validasi umum
+          Swal.fire({
+            icon: 'error',
+            title: 'Registrasi Gagal',
+            text: error.response.data.error || 'Data registrasi tidak valid',
+          })
+          break
 
-          // Cek error spesifik
-          if (typeof validationErrors === 'string') {
+        case 409:
+          if (error.response.data.error === 'Email sudah terdaftar') {
             Swal.fire({
               icon: 'error',
-              title: 'Validasi Gagal',
-              text: validationErrors,
+              title: 'Email Sudah Terdaftar',
+              text: 'Email ini sudah digunakan oleh akun lain',
+              confirmButtonText: 'Coba Email Lain',
             })
-          } else if (Array.isArray(validationErrors)) {
-            // Jika error adalah array, ambil pesan pertama
+          } else if (error.response.data.error === 'Username sudah digunakan') {
             Swal.fire({
               icon: 'error',
-              title: 'Validasi Gagal',
-              text: validationErrors[0],
+              title: 'Username Sudah Terpakai',
+              text: 'Username ini sudah digunakan oleh akun lain',
+              confirmButtonText: 'Pilih Username Lain',
             })
-          } else if (typeof validationErrors === 'object') {
-            // Jika error adalah object, cari pesan error
-            const errorMessage = Object.values(validationErrors)[0]
+          } else {
             Swal.fire({
               icon: 'error',
-              title: 'Validasi Gagal',
-              text: errorMessage,
+              title: 'Registrasi Gagal',
+              text:
+                error.response.data.error ||
+                'Data yang Anda masukkan sudah terdaftar',
+              confirmButtonText: 'Coba Lagi',
             })
           }
           break
 
-        case 409:
-          // Conflict error (email/username sudah ada)
-          Swal.fire({
-            icon: 'error',
-            title: 'Registrasi Gagal',
-            text:
-              error.response.data.error ||
-              'Email atau username sudah terdaftar',
-          })
-          break
-
         case 500:
-          // Server error
           Swal.fire({
             icon: 'error',
-            title: 'Kesalahan Saat Registrasi',
-            text: 'Pastikan Username / Email belum terdaftar dan password menggunakan nomor',
+            title: 'Kesalahan Server',
+            text: 'Terjadi masalah pada server. Silakan coba lagi.',
           })
           break
 
         default:
-          // Error umum
           Swal.fire({
             icon: 'error',
             title: 'Registrasi Gagal',
-            text: error.response.data.message || 'Terjadi kesalahan',
+            text:
+              error.response.data.error || 'Terjadi kesalahan saat registrasi',
           })
       }
+    } else if (error.request) {
+      // Tidak ada response dari server
+      Swal.fire({
+        icon: 'error',
+        title: 'Koneksi Gagal',
+        text: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+      })
+    } else {
+      // Error lainnya
+      Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: 'Terjadi kesalahan yang tidak terduga',
+      })
     }
 
+    // Tetap lempar error untuk penanganan di komponen
     throw error
   }
 }

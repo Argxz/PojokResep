@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../redux/action/authActions'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { LogOut, Upload, BookOpen, AlertCircle } from 'lucide-react'
 
 const LogoutButton = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
 
   const { user } = useSelector((state) => state.auth)
@@ -23,7 +22,6 @@ const LogoutButton = () => {
 
   const handleLogoutConfirm = () => {
     dispatch(logoutUser())
-    navigate('/login')
   }
 
   return (

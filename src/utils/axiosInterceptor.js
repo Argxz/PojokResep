@@ -1,9 +1,9 @@
 import axios from 'axios'
 import { store } from '../redux/store'
 import { logoutUser, refreshTokenAction } from '../redux/action/authActions'
-import Swal from 'sweetalert2'
 
-const BASE_URL = 'http://localhost:3001/api/v1'
+const BASE_URL = import.meta.env.VITE_BASE_URL
+const REFRESH_TOKEN_ENDPOINT = import.meta.env.VITE_REFRESH_TOKEN_ENDPOINT
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -45,9 +45,12 @@ const setupAxiosInterceptors = () => {
           }
 
           // Kirim request refresh token
-          const response = await axios.post(`${BASE_URL}/users/refresh-token`, {
-            refreshToken,
-          })
+          const response = await axios.post(
+            `${BASE_URL}${REFRESH_TOKEN_ENDPOINT}`,
+            {
+              refreshToken,
+            },
+          )
 
           const { accessToken, refreshToken: newRefreshToken } = response.data
 

@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2'
 import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
-const BASE_URL = 'http://localhost:3001/api/v1/comments'
+const BASE_URL = import.meta.env.VITE_COMMENT_URL
 const axiosInstance = setupAxiosInterceptors()
 
 export const createComment =

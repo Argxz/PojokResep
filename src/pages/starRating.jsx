@@ -5,19 +5,24 @@ import {
   fetchUserRatingForRecipe,
 } from '../redux/action/ratingAction'
 
-const StarRating = ({ value, editable = false, onRateChange, recipeId }) => {
+const StarRating = ({
+  value,
+  editable = false,
+  onRateChange,
+  recipeId,
+  userRatingValue, // Tambahkan parameter ini
+}) => {
   const dispatch = useDispatch()
-  const [rating, setRating] = useState(value)
+  // Gunakan userRatingValue sebagai initial state
+  const [rating, setRating] = useState(userRatingValue || 0)
   const [hover, setHover] = useState(0)
 
-  const userRating = useSelector((state) => state.rating.userRating)
-
-  // Tambahkan useEffect untuk mengupdate rating saat value berubah
   useEffect(() => {
-    // Pastikan value adalah angka dan valid
-    const initialRating = typeof value === 'number' && value > 0 ? value : 0
-    setRating(initialRating)
-  }, [value])
+    // Update rating jika userRatingValue berubah
+    if (userRatingValue !== undefined) {
+      setRating(userRatingValue)
+    }
+  }, [userRatingValue])
 
   useEffect(() => {
     const fetchRating = async () => {

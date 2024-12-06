@@ -41,8 +41,25 @@ const Dashboard = () => {
     }
 
     try {
-      await dispatch(register(username, email, password))
-      setActiveTab('login')
+      const result = await dispatch(register(username, email, password))
+
+      // Gunakan Sweet Alert untuk konfirmasi
+      const { isConfirmed } = await Swal.fire({
+        title: 'Registrasi Berhasil!',
+        text: 'Apakah Anda ingin login sekarang?',
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Login',
+        cancelButtonText: 'Tidak',
+      })
+
+      // Hanya pindah tab jika user memilih untuk login
+      if (isConfirmed) {
+        setActiveTab('login')
+
+        // Optional: Set email untuk login otomatis
+        setEmail(email)
+      }
     } catch (error) {
       console.error('Register error:', error)
     }
@@ -106,10 +123,6 @@ const Dashboard = () => {
                 variants={formVariants}
               >
                 <form onSubmit={handleLogin} className="space-y-6">
-                  {error && (
-                    <div className="text-red-500 text-center mb-4">{error}</div>
-                  )}
-
                   {/* Email Input */}
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

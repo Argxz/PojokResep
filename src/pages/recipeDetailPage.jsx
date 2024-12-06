@@ -25,6 +25,15 @@ const RecipeDetailPage = () => {
   // Ambil ratings dari redux
   const ratings = useSelector((state) => state.rating.ratings)
 
+  const userRatingValue = useMemo(() => {
+    if (!Array.isArray(ratings) || !authUser) return 0
+
+    // Cari rating yang dibuat oleh user saat ini
+    const userRating = ratings.find((rating) => rating.user_id === authUser.id)
+
+    return userRating ? userRating.value : 0
+  }, [ratings, authUser])
+
   const recipeRating = useMemo(() => {
     // Pastikan ratings adalah array dan memiliki value
     if (!Array.isArray(ratings) || ratings.length === 0) return 0
@@ -173,6 +182,7 @@ const RecipeDetailPage = () => {
                   <div className="flex items-center">
                     <StarRating
                       value={recipeRating || 0}
+                      userRatingValue={userRatingValue}
                       editable={authUser && authUser.id !== recipe.user_id}
                       recipeId={recipeId}
                       className="text-amber-500 hover:text-amber-600 transition-colors"
@@ -183,7 +193,7 @@ const RecipeDetailPage = () => {
                       ({(recipeRating || 0).toFixed(1)}
                     </span>
                     <span className="text-gray-500 text-sm">
-                      / 5) · {ratings.length} Rating
+                      / 5) · {ratings.length || '0'} Rating
                     </span>
                   </div>
                 </div>

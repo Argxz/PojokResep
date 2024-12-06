@@ -1,14 +1,14 @@
 import Swal from 'sweetalert2'
 import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
-const BASE_URL = 'http://localhost:3001/api/v1/recipes'
+const BASE_URL = import.meta.env.VITE_RECIPE_URL
 
 const axiosInstance = setupAxiosInterceptors()
 export const createRecipe = (recipeData) => async (dispatch) => {
   try {
     dispatch({ type: 'CREATE_RECIPE_REQUEST' })
 
-    const response = await axiosInstance.post('/recipes', recipeData, {
+    const response = await axiosInstance.post(`${BASE_URL}`, recipeData, {
       headers: {
         'Content-Type': 'multipart/form-data', // Penting untuk upload file
       },
@@ -52,7 +52,7 @@ export const getAllRecipes = () => async (dispatch) => {
   try {
     dispatch({ type: 'GET_RECIPES_REQUEST' })
 
-    const response = await axiosInstance.get('/recipes')
+    const response = await axiosInstance.get(`${BASE_URL}`)
 
     dispatch({
       type: 'GET_RECIPES_SUCCESS',
@@ -72,7 +72,7 @@ export const getAllRecipes = () => async (dispatch) => {
 
 export const fetchRecipeDetail = (recipeId) => async (dispatch) => {
   try {
-    const response = await axiosInstance.get(`/recipes/${recipeId}`)
+    const response = await axiosInstance.get(`${BASE_URL}/${recipeId}`)
 
     // Pastikan data ada
     if (!response.data) {
@@ -98,11 +98,15 @@ export const fetchRecipeDetail = (recipeId) => async (dispatch) => {
 
 export const updateRecipe = (recipeId, formData) => async (dispatch) => {
   try {
-    const response = await axiosInstance.put(`/recipes/${recipeId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const response = await axiosInstance.put(
+      `${BASE_URL}/${recipeId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    })
+    )
 
     dispatch({
       type: 'UPDATE_RECIPE_SUCCESS',
@@ -140,7 +144,7 @@ export const deleteRecipe = (recipeId) => async (dispatch) => {
   try {
     dispatch({ type: 'DELETE_RECIPE_REQUEST' })
 
-    const response = await axiosInstance.delete(`/recipes/${recipeId}`)
+    const response = await axiosInstance.delete(`${BASE_URL}/${recipeId}`)
 
     dispatch({
       type: 'DELETE_RECIPE_SUCCESS',
@@ -187,12 +191,5 @@ export const fetchUserRecipes = () => async (dispatch, getState) => {
       type: 'FETCH_USER_RECIPES_SUCCESS',
       payload: response.data,
     })
-  } catch (error) {
-    console.error('Error fetching user recipes:', error)
-    dispatch({
-      type: 'FETCH_USER_RECIPES_FAILURE',
-      payload: error.response?.data || error.message,
-    })
-    throw error
-  }
+  } catch (error) {}
 }

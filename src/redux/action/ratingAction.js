@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2'
 import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
-const BASE_URL = 'http://localhost:3001/api/v1/ratings'
+const BASE_URL = import.meta.env.VITE_RATING_URL
 const axiosInstance = setupAxiosInterceptors()
 
 export const submitRating = (recipeId, value) => async (dispatch, getState) => {
@@ -99,10 +99,23 @@ export const fetchRecipeRatings = (recipeId) => async (dispatch) => {
       payload: response.data, // Kirim seluruh data dari response
     })
   } catch (error) {
-    console.error('Fetch Ratings Error:', error.response?.data || error.message)
-    dispatch({
-      type: 'FETCH_RECIPE_RATINGS_FAILURE',
-      payload: error.response?.data?.error || 'Failed to fetch ratings',
-    })
+    // Cek apakah error status adalah 404
+    if (error.response && error.response.status === 404) {
+      // Jika 404, dispatch dengan data default atau kosong
+      dispatch({
+        type: 'FETCH_RECIPE_RATINGS_SUCCESS',
+        payload: {
+          ratings: [],
+          averageRating: 0,
+          message: 'Belum ada rating',
+        },
+      })
+    } else {
+      // Untuk error lainnya, tetap gunakan error handling biasa
+      dispatch({
+        type: 'FETCH_RECIPE_RATINGS_FAILURE',
+        payload: error.response?.data?.error || 'Failed to fetch ratings',
+      })
+    }
   }
 }
