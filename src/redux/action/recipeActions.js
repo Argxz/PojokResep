@@ -2,8 +2,8 @@ import Swal from 'sweetalert2'
 import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
 const BASE_URL = import.meta.env.VITE_RECIPE_URL
-
 const axiosInstance = setupAxiosInterceptors()
+
 export const createRecipe = (recipeData) => async (dispatch) => {
   try {
     dispatch({ type: 'CREATE_RECIPE_REQUEST' })
@@ -48,27 +48,49 @@ export const createRecipe = (recipeData) => async (dispatch) => {
   }
 }
 
-export const getAllRecipes = () => async (dispatch) => {
-  try {
-    dispatch({ type: 'GET_RECIPES_REQUEST' })
+export const getAllRecipes =
+  (page = 1, limit = 8) =>
+  async (dispatch, getState) => {
+    try {
+      const { auth } = getState()
+      dispatch({ type: 'GET_RECIPES_REQUEST' })
 
-    const response = await axiosInstance.get(`${BASE_URL}`)
+      const response = await axiosInstance.get(
+        `${BASE_URL}?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+          },
+        },
+      )
 
-    dispatch({
-      type: 'GET_RECIPES_SUCCESS',
-      payload: response.data.data,
-    })
+      // Tambahkan penanganan kasus respons berbeda
+      const data = response.data.data || response.data
 
-    return response.data.data
-  } catch (error) {
-    dispatch({
-      type: 'GET_RECIPES_FAIL',
-      payload: error.response?.data?.message || 'Gagal mengambil resep',
-    })
+      dispatch({
+        type: 'GET_RECIPES_SUCCESS',
+        payload: {
+          recipes: data.recipes || data,
+          currentPage: data.currentPage || page,
+          totalPages: data.totalPages || 1,
+          totalRecipes:
+            data.totalRecipes || (data.recipes ? data.recipes.length : 0),
+        },
+      })
+    } catch (error) {
+      console.error('Error fetching recipes:', error)
+      console.error('Error Response:', error.response)
 
-    throw error
+      dispatch({
+        type: 'GET_RECIPES_FAIL',
+        payload:
+          error.response?.data?.message ||
+          error.message ||
+          'Error fetching recipes',
+      })
+    }
   }
-}
 
 export const fetchRecipeDetail = (recipeId) => async (dispatch) => {
   try {

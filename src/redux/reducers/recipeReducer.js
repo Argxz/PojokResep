@@ -1,6 +1,11 @@
 const initialState = {
   recipes: [],
-  currentRecipe: null,
+  pagination: {
+    currentPage: 1,
+    totalPages: 0,
+    totalRecipes: 0,
+    limit: 8,
+  },
   loading: false,
   error: null,
 }
@@ -23,14 +28,23 @@ const recipeReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       }
+
     case 'GET_RECIPES_REQUEST':
-      return { ...state, loading: true }
+      return {
+        ...state,
+        loading: true,
+      }
 
     case 'GET_RECIPES_SUCCESS':
       return {
         ...state,
         loading: false,
-        recipes: action.payload,
+        recipes: action.payload.recipes,
+        pagination: {
+          currentPage: action.payload.currentPage,
+          totalPages: action.payload.totalPages,
+          totalRecipes: action.payload.totalRecipes,
+        },
       }
 
     case 'GET_RECIPES_FAIL':
@@ -104,18 +118,30 @@ const recipeReducer = (state = initialState, action) => {
         loading: true,
         error: null,
       }
+
     case 'FETCH_USER_RECIPES_SUCCESS':
       return {
         ...state,
         loading: false,
-        recipes: action.payload,
+        recipes: action.payload.recipes, // Sesuaikan dengan struktur payload
+        pagination: {
+          currentPage: action.payload.currentPage,
+          totalPages: action.payload.totalPages,
+          totalRecipes: action.payload.totalRecipes,
+        },
         error: null,
       }
+
     case 'FETCH_USER_RECIPES_FAIL':
       return {
         ...state,
         loading: false,
         recipes: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalRecipes: 0,
+        },
         error: action.payload,
       }
     default:
