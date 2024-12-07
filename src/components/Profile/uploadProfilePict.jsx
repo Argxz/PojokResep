@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Camera, X } from 'lucide-react'
 
 // Import komponen / aset dan actions
-import { uploadProfilePicture } from '../redux/action/userActions'
+import { uploadProfilePicture } from '../../redux/action/userActions'
 
 const ProfilePictureUpload = ({ onSuccessUpload, className = '' }) => {
   // State management untuk upload gambar

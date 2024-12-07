@@ -7,7 +7,7 @@ import { User, Mail, Image, Edit2, Shield, X, Check } from 'lucide-react'
 import {
   fetchUserProfile,
   updateUsernameEmail,
-} from '../redux/action/userActions'
+} from '../../redux/action/userActions'
 import ProfilePictureUpload from './uploadProfilePict'
 
 const Profile = () => {

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   submitRating,
   fetchUserRatingForRecipe,
-} from '../redux/action/ratingActions'
+} from '../../redux/action/ratingActions'
 
 const StarRating = ({
   value,

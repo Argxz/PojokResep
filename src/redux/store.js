@@ -15,13 +15,14 @@ import recipeReducer from './reducers/recipeReducer'
 import userReducer from './reducers/userReducer'
 import { commentReducer } from './reducers/commentReducer'
 import { ratingReducer } from './reducers/ratingReducer'
+import categoriesReducer from './reducers/categoriesReducer'
 
 // Konfigurasi persist
 const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['auth'], // Tetap hanya persist auth
+  whitelist: ['auth'],
 }
 
 // Buat reducer yang dipersist
@@ -33,6 +34,7 @@ const persistedReducer = persistReducer(
     user: userReducer,
     comment: commentReducer,
     rating: ratingReducer,
+    categories: categoriesReducer,
   }),
 )
 

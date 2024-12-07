@@ -6,8 +6,8 @@ import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
 import { fetchRecipeRatings } from '../redux/action/ratingActions'
 import { Typography, Box, CircularProgress } from '@mui/material'
-import CommentSection from './commentSection'
-import StarRating from './starRating'
+import CommentSection from '../components/Recipes/commentSection'
+import StarRating from '../components/Recipes/starRating'
 
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()

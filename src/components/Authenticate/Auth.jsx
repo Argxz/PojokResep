@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { login, register } from '../redux/action/authActions'
+import { useDispatch } from 'react-redux'
+import { login, register } from '../../redux/action/authActions'
 import { useNavigate } from 'react-router-dom'
-import LogoImage from '../assets/porespth.png'
-import SmallLogo from '../assets/pores-sm2.png'
+import LogoImage from '../../assets/porespth.png'
+import SmallLogo from '../../assets/pores-sm2.png'
 import Swal from 'sweetalert2'
 import { Mail, Lock, User, KeyRound } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const Dashboard = () => {
+const Auth = () => {
   const [activeTab, setActiveTab] = useState('login')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -17,7 +17,6 @@ const Dashboard = () => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { error } = useSelector((state) => state.auth)
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -262,7 +261,7 @@ const Dashboard = () => {
             <p className="mb-6 text-white/80">
               {activeTab === 'login'
                 ? 'Daftar dan mulai perjalanan Anda bersama kami!'
-                : 'Masuk untuk mengakses dashboard pribadi Anda.'}
+                : 'Masuk untuk mengakses akun pribadi Anda.'}
             </p>
             <button
               onClick={() =>
@@ -279,4 +278,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Auth

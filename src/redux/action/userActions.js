@@ -34,7 +34,7 @@ export const uploadProfilePicture = (file) => async (dispatch) => {
     formData.append('profile_picture', file)
 
     const response = await axiosInstance.post(
-      '/users/upload-profile-picture',
+      `${BASE_URL}/upload-profile-picture`,
       formData,
       {
         headers: {

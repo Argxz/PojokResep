@@ -15,7 +15,7 @@ import {
   fetchCommentsByRecipeId,
   updateComment,
   deleteComment,
-} from '../redux/action/commentActions'
+} from '../../redux/action/commentActions'
 
 const CommentSection = ({ recipeId }) => {
   const dispatch = useDispatch()

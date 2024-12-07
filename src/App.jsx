@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Route,
@@ -6,20 +6,27 @@ import {
   Navigate,
 } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import Dashboard from './pages/Dashboard'
-import Logout from './pages/logout'
-import Profile from './pages/Profile'
-import ProfilePictureUpload from './pages/uploadProfilePict'
+
+// Import Pages
+import Auth from './pages/AuthPages'
+import LandingPage from './components/LandingPage'
+import Profile from './components/Profile/Profile'
 import CreateRecipe from './pages/createRecipe'
 import RecipeList from './pages/recipeList'
 import RecipeDetailPage from './pages/recipeDetailPage'
 import UserRecipes from './pages/userRecipes'
 import UpdateRecipe from './pages/updateRecipePage'
-import PrivateRoute from './components/PrivateRoute'
+
+// Import Components
+import Sidebar from './components/Sidebar'
+import ProfilePictureUpload from './components/Profile/uploadProfilePict'
+
+//Import Routes
+import PrivateRoute from './routes/PrivateRoute'
+
+// Import Utilities
 import setupAxiosInterceptors from './utils/axiosInterceptor'
 import { verifyToken } from './redux/action/authActions'
-
-import Sidebar from './components/Sidebar'
 
 function App() {
   const dispatch = useDispatch()
@@ -37,31 +44,27 @@ function App() {
   return (
     <Router>
       <div className="flex">
-        {/* Sidebar - tampilkan hanya jika sudah login */}
         {isAuthenticated && <Sidebar />}
 
-        {/* Konten utama dengan margin kiri jika sidebar ada */}
         <div
           className={`
-          flex-1 
-          ${isAuthenticated ? 'ml-60' : ''} 
-          p-4 
-          overflow-y-auto 
-          h-screen
-        `}
+            flex-1 
+            ${isAuthenticated ? 'ml-60' : ''} 
+            p-4 
+            overflow-y-auto 
+            h-screen
+          `}
         >
           <Routes>
-            {/* Rute login */}
+            {/* Authentication Route */}
             <Route
               path="/login"
-              element={
-                isAuthenticated ? <Navigate to="/" replace /> : <Dashboard />
-              }
+              element={isAuthenticated ? <Navigate to="/" replace /> : <Auth />}
             />
 
-            {/* Rute yang memerlukan autentikasi */}
+            {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
-              <Route path="/" element={<Logout />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/recipe" element={<RecipeList />} />
               <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
@@ -74,7 +77,7 @@ function App() {
               />
             </Route>
 
-            {/* Tangkap rute yang tidak ditemukan */}
+            {/* Catch-all Route */}
             <Route
               path="*"
               element={

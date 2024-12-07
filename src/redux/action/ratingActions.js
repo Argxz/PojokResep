@@ -1,12 +1,23 @@
+// Impor library yang dibutuhkan
 import Swal from 'sweetalert2'
 import setupAxiosInterceptors from '../../utils/axiosInterceptor'
 
+// Ambil URL basis dari environment variable
 const BASE_URL = import.meta.env.VITE_RATING_URL
+// Buat instance axios dengan interceptor
 const axiosInstance = setupAxiosInterceptors()
 
+/**
+ * Aksi untuk mengirim rating resep
+ * @param {number} recipeId - ID resep yang akan diberi rating
+ * @param {number} value - Nilai rating
+ */
 export const submitRating = (recipeId, value) => async (dispatch, getState) => {
   try {
+    // Ambil token otentikasi dari state
     const { auth } = getState()
+
+    // Kirim permintaan POST untuk rating
     const response = await axiosInstance.post(
       `${BASE_URL}`,
       {
@@ -20,6 +31,7 @@ export const submitRating = (recipeId, value) => async (dispatch, getState) => {
       },
     )
 
+    // Dispatch aksi sukses dengan data rating
     dispatch({
       type: 'SUBMIT_RATING_SUCCESS',
       payload: {
@@ -28,7 +40,7 @@ export const submitRating = (recipeId, value) => async (dispatch, getState) => {
       },
     })
 
-    // Optional: Tampilkan toast sukses
+    // Tampilkan notifikasi sukses
     Swal.fire({
       icon: 'success',
       title: 'Rating Berhasil Disimpan',
@@ -37,11 +49,13 @@ export const submitRating = (recipeId, value) => async (dispatch, getState) => {
       showConfirmButton: false,
       timer: 500,
     }).then(() => {
+      // Muat ulang halaman setelah notifikasi
       window.location.reload()
     })
 
     return response.data
   } catch (error) {
+    // Tangani kesalahan dan tampilkan pesan error
     Swal.fire({
       icon: 'error',
       title: 'Gagal Memberi Rating',
@@ -51,16 +65,24 @@ export const submitRating = (recipeId, value) => async (dispatch, getState) => {
   }
 }
 
+/**
+ * Aksi untuk mengambil rating pengguna untuk resep tertentu
+ * @param {number} recipeId - ID resep yang akan dicari ratingnya
+ */
 export const fetchUserRatingForRecipe =
   (recipeId) => async (dispatch, getState) => {
     try {
+      // Ambil token otentikasi dari state
       const { auth } = getState()
+
+      // Kirim permintaan GET untuk rating pengguna
       const response = await axiosInstance.get(`${BASE_URL}/user/${recipeId}`, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
       })
 
+      // Dispatch aksi sukses dengan rating pengguna
       dispatch({
         type: 'FETCH_USER_RATING_SUCCESS',
         payload: {
@@ -70,7 +92,7 @@ export const fetchUserRatingForRecipe =
 
       return response.data
     } catch (error) {
-      // Khusus 404 untuk belum ada rating
+      // Tangani kasus khusus untuk rating yang belum ada (404)
       if (error.response && error.response.status === 404) {
         dispatch({
           type: 'FETCH_USER_RATING_SUCCESS',
@@ -81,6 +103,7 @@ export const fetchUserRatingForRecipe =
         return { userRating: null }
       }
 
+      // Tampilkan pesan error untuk kesalahan lainnya
       Swal.fire({
         icon: 'error',
         title: 'Gagal Mengambil Rating',
@@ -90,18 +113,23 @@ export const fetchUserRatingForRecipe =
     }
   }
 
+/**
+ * Aksi untuk mengambil rating resep
+ * @param {number} recipeId - ID resep yang akan dicari ratingnya
+ */
 export const fetchRecipeRatings = (recipeId) => async (dispatch) => {
   try {
+    // Kirim permintaan GET untuk rating resep
     const response = await axiosInstance.get(`${BASE_URL}/recipes/${recipeId}`)
 
+    // Dispatch aksi sukses dengan data rating
     dispatch({
       type: 'FETCH_RECIPE_RATINGS_SUCCESS',
-      payload: response.data, // Kirim seluruh data dari response
+      payload: response.data,
     })
   } catch (error) {
-    // Cek apakah error status adalah 404
+    // Tangani kasus khusus untuk rating yang belum ada (404)
     if (error.response && error.response.status === 404) {
-      // Jika 404, dispatch dengan data default atau kosong
       dispatch({
         type: 'FETCH_RECIPE_RATINGS_SUCCESS',
         payload: {
@@ -111,10 +139,10 @@ export const fetchRecipeRatings = (recipeId) => async (dispatch) => {
         },
       })
     } else {
-      // Untuk error lainnya, tetap gunakan error handling biasa
+      // Dispatch aksi gagal untuk kesalahan lainnya
       dispatch({
         type: 'FETCH_RECIPE_RATINGS_FAILURE',
-        payload: error.response?.data?.error || 'Failed to fetch ratings',
+        payload: error.response?.data?.error || 'Gagal mengambil rating',
       })
     }
   }
