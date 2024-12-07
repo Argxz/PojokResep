@@ -103,7 +103,7 @@ const recipeReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         recipes: state.recipes.filter((recipe) => recipe.id !== action.payload),
-        currentRecipe: null, // Reset current recipe setelah dihapus
+        currentRecipe: null,
       }
 
     case 'DELETE_RECIPE_FAIL':
@@ -123,7 +123,7 @@ const recipeReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        recipes: action.payload.recipes || action.payload, // Antisipasi struktur berbeda
+        recipes: action.payload.recipes || action.payload,
         pagination: {
           currentPage: action.payload.currentPage || 1,
           totalPages: action.payload.totalPages || 1,

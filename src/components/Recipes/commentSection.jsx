@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+//Impor komponen yg diperlukan
+import Swal from 'sweetalert2'
 import {
   Edit,
   Trash2,
@@ -10,6 +13,8 @@ import {
   LogIn,
   MessageSquare,
 } from 'lucide-react'
+
+// Impor actions
 import {
   createComment,
   fetchCommentsByRecipeId,
@@ -17,21 +22,36 @@ import {
   deleteComment,
 } from '../../redux/action/commentActions'
 
+/**
+ * Komponen untuk menampilkan dan mengelola komentar
+ * @param {Object} props - Properti komponen
+ * @param {string} props.recipeId - ID resep
+ */
 const CommentSection = ({ recipeId }) => {
   const dispatch = useDispatch()
+
+  // State untuk manajemen komentar
   const [commentContent, setCommentContent] = useState('')
   const [editingComment, setEditingComment] = useState(null)
+
+  // Selector untuk mengambil data dari state global
   const comments = useSelector((state) => state.comment.comments)
   const commentMessage = useSelector((state) => state.comment.message)
   const authUser = useSelector((state) => state.auth.user)
 
+  // Ambil komentar saat komponen dimuat atau recipeId berubah
   useEffect(() => {
     dispatch(fetchCommentsByRecipeId(recipeId))
   }, [dispatch, recipeId])
 
+  /**
+   * Menangani submit komentar baru
+   * @param {Event} e - Event formulir
+   */
   const handleSubmitComment = async (e) => {
     e.preventDefault()
 
+    // Validasi komentar kosong
     if (!commentContent.trim()) {
       Swal.fire({
         icon: 'warning',
@@ -42,6 +62,7 @@ const CommentSection = ({ recipeId }) => {
     }
 
     try {
+      // Dispatch aksi membuat komentar
       await dispatch(createComment(recipeId, commentContent))
       setCommentContent('')
     } catch (error) {
@@ -49,12 +70,20 @@ const CommentSection = ({ recipeId }) => {
     }
   }
 
+  /**
+   * Memulai proses edit komentar
+   * @param {Object} comment - Komentar yang akan diedit
+   */
   const handleEditComment = (comment) => {
     setEditingComment(comment)
     setCommentContent(comment.content)
   }
 
+  /**
+   * Menangani update komentar
+   */
   const handleUpdateComment = async () => {
+    // Validasi komentar kosong
     if (!commentContent.trim()) {
       Swal.fire({
         icon: 'warning',
@@ -65,6 +94,7 @@ const CommentSection = ({ recipeId }) => {
     }
 
     try {
+      // Dispatch aksi update komentar
       await dispatch(updateComment(editingComment.id, commentContent))
       setEditingComment(null)
       setCommentContent('')
@@ -73,12 +103,31 @@ const CommentSection = ({ recipeId }) => {
     }
   }
 
+  /**
+   * Menangani penghapusan komentar
+   * @param {string} commentId - ID komentar yang akan dihapus
+   */
   const handleDeleteComment = (commentId) => {
-    dispatch(deleteComment(commentId))
+    // Tampilkan konfirmasi sebelum menghapus
+    Swal.fire({
+      title: 'Hapus Komentar',
+      text: 'Apakah Anda yakin ingin menghapus komentar ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteComment(commentId))
+      }
+    })
   }
 
   return (
     <div className="bg-white border-r-4 border-blue-500 rounded-lg shadow-lg p-6">
+      {/* Judul Bagian Komentar */}
       <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
         <MessageCircle className="mr-3 text-blue-500" />
         Komentar
@@ -100,9 +149,12 @@ const CommentSection = ({ recipeId }) => {
             rows="4"
             maxLength={500}
           />
+          {/* Penghitung karakter */}
           <span className="absolute bottom-2 right-4 text-gray-400">
             {commentContent.length}/500
           </span>
+
+          {/* Tombol Aksi */}
           <div className="flex space-x-2 mt-3">
             {editingComment ? (
               <>
@@ -137,6 +189,7 @@ const CommentSection = ({ recipeId }) => {
           </div>
         </form>
       ) : (
+        // Pesan untuk login
         <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
           <p className="text-yellow-700">
             <LogIn className="inline mr-2" />
@@ -148,6 +201,7 @@ const CommentSection = ({ recipeId }) => {
       {/* Daftar Komentar */}
       <div className="space-y-4 mt-6">
         {comments.length === 0 ? (
+          // Tampilan saat tidak ada komentar
           <div className="text-center bg-gray-100 p-6 rounded-lg">
             <MessageSquare className="mx-auto mb-3 text-gray-400" size={48} />
             <p className="text-gray-500">
@@ -155,6 +209,7 @@ const CommentSection = ({ recipeId }) => {
             </p>
           </div>
         ) : (
+          // Daftar komentar
           comments.map((comment) => (
             <div
               key={comment.id}

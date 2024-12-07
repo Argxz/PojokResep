@@ -8,12 +8,10 @@ import {
   Home,
   AlertCircle,
   CookingPot,
-  Instagram,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
-// Import aset dan actions
-import SmallLogo from '../assets/pores-sm2.png'
+// Import actions
 import { logoutUser } from '../redux/action/authActions'
 
 const Sidebar = () => {

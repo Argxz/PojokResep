@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { fetchUserRecipes } from '../redux/action/recipeActions'
@@ -13,14 +13,19 @@ import {
   Button,
   Typography,
   Box,
-  CircularProgress,
   Card,
   CardContent,
   Grid,
   Chip,
 } from '@mui/material'
-import { Eye, BookOpen, Calendar, Layers, PlusCircle } from 'lucide-react'
+import { Eye, BookOpen, Calendar, PlusCircle } from 'lucide-react'
+import Swal from 'sweetalert2'
 
+/**
+ * Komponen untuk menampilkan daftar resep pengguna
+ * @component
+ * @returns {JSX.Element} Halaman resep pengguna
+ */
 const UserRecipes = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -40,18 +45,37 @@ const UserRecipes = () => {
     }
   }, [dispatch, user])
 
-  // Handler untuk view recipe
+  // Tampilkan error jika ada
+  useEffect(() => {
+    if (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Memuat Resep',
+        text: error,
+      })
+    }
+  }, [error])
+
+  /**
+   * Handler untuk melihat detail resep
+   * @param {string} recipeId - ID resep
+   */
   const handleViewRecipe = (recipeId) => {
     navigate(`/recipe/${recipeId}`)
   }
 
-  // Handler untuk create recipe
+  /**
+   * Handler untuk membuat resep baru
+   */
   const handleCreateRecipe = () => {
     navigate('/upload-recipe')
   }
 
-  // Filter dan sort recipes
-  const processedRecipes = React.useMemo(() => {
+  /**
+   * Memproses dan memfilter resep
+   * @returns {Array} Daftar resep yang sudah diproses
+   */
+  const processedRecipes = useMemo(() => {
     let result = recipes || []
 
     // Filter berdasarkan kategori
@@ -59,7 +83,7 @@ const UserRecipes = () => {
       result = result.filter((recipe) => recipe.category?.name === filter)
     }
 
-    // Sorting
+    // Sorting berdasarkan tanggal
     result.sort((a, b) => {
       if (sortBy === 'createdAt') {
         return new Date(b.createdAt) - new Date(a.createdAt)
@@ -70,13 +94,31 @@ const UserRecipes = () => {
     return result
   }, [recipes, filter, sortBy])
 
-  //Format tanggal dd/mm/yyyy
+  /**
+   * Memformat tanggal
+   * @param {string} dateString - Tanggal dalam format string
+   * @returns {string} Tanggal yang diformat
+   */
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${day}/${month}/${year}`
+  }
+
+  // Tampilan loading
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+      </Box>
+    )
   }
 
   return (
@@ -86,6 +128,7 @@ const UserRecipes = () => {
         minHeight: '100vh',
       }}
     >
+      {/* Header */}
       <CardContent>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
@@ -120,6 +163,7 @@ const UserRecipes = () => {
         </Grid>
       </CardContent>
 
+      {/* Kondisi saat tidak ada resep */}
       {processedRecipes.length === 0 ? (
         <Card
           sx={{
@@ -134,8 +178,10 @@ const UserRecipes = () => {
           </Typography>
         </Card>
       ) : (
+        // Tabel resep
         <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
           <Table>
+            {/* Header Tabel */}
             <TableHead
               sx={{
                 backgroundColor: '#1e1e1e',
@@ -162,6 +208,8 @@ const UserRecipes = () => {
                 )}
               </TableRow>
             </TableHead>
+
+            {/* Body Tabel */}
             <TableBody>
               {processedRecipes.map((recipe, index) => (
                 <TableRow

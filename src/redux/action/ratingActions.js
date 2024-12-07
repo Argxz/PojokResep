@@ -1,11 +1,9 @@
 // Impor library yang dibutuhkan
 import Swal from 'sweetalert2'
-import setupAxiosInterceptors from '../../utils/axiosInterceptor'
+import { axiosInstance } from '../../utils/axiosInterceptor'
 
 // Ambil URL basis dari environment variable
 const BASE_URL = import.meta.env.VITE_RATING_URL
-// Buat instance axios dengan interceptor
-const axiosInstance = setupAxiosInterceptors()
 
 /**
  * Aksi untuk mengirim rating resep

@@ -1,8 +1,7 @@
 import Swal from 'sweetalert2'
-import setupAxiosInterceptors from '../../utils/axiosInterceptor'
+import { axiosInstance } from '../../utils/axiosInterceptor'
 
 const BASE_URL = import.meta.env.VITE_USER_URL
-const axiosInstance = setupAxiosInterceptors()
 
 export const uploadProfilePicture = (file) => async (dispatch) => {
   // Validasi file

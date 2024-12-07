@@ -8,46 +8,50 @@ import { fetchRecipeRatings } from '../redux/action/ratingActions'
 import { Typography, Box, CircularProgress } from '@mui/material'
 import CommentSection from '../components/Recipes/commentSection'
 import StarRating from '../components/Recipes/starRating'
+import Swal from 'sweetalert2'
 
+/**
+ * Halaman Detail Resep
+ * @component
+ * @returns {JSX.Element} Komponen halaman detail resep
+ */
 const RecipeDetailPage = () => {
   const dispatch = useDispatch()
   const { recipeId } = useParams()
   const navigate = useNavigate()
 
+  // State untuk modal konfirmasi
   const [showModal, setShowModal] = useState(false)
 
+  // Selector untuk mengambil data dari state global
   const recipe = useSelector((state) => state.recipe.currentRecipe)
   const authUser = useSelector((state) => state.auth.user)
   const error = useSelector((state) => state.recipe.error)
   const authLoading = useSelector((state) => state.auth.loading)
   const recipeLoading = useSelector((state) => state.recipe.loading)
-
-  // Ambil ratings dari redux
   const ratings = useSelector((state) => state.rating.ratings)
 
+  /**
+   * Menghitung rating user saat ini
+   */
   const userRatingValue = useMemo(() => {
     if (!Array.isArray(ratings) || !authUser) return 0
 
-    // Cari rating yang dibuat oleh user saat ini
     const userRating = ratings.find((rating) => rating.user_id === authUser.id)
-
     return userRating ? userRating.value : 0
   }, [ratings, authUser])
 
+  /**
+   * Menghitung rating rata-rata resep
+   */
   const recipeRating = useMemo(() => {
-    // Pastikan ratings adalah array dan memiliki value
     if (!Array.isArray(ratings) || ratings.length === 0) return 0
 
-    // Hitung rata-rata
-    const totalRating = ratings.reduce((sum, rating) => {
-      return sum + rating.value
-    }, 0)
-
-    const avgRating = totalRating / ratings.length
-
-    return avgRating
+    const totalRating = ratings.reduce((sum, rating) => sum + rating.value, 0)
+    return totalRating / ratings.length
   }, [ratings])
 
+  // Ambil data saat komponen dimuat
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,33 +59,25 @@ const RecipeDetailPage = () => {
         await dispatch(fetchUserProfile())
         await dispatch(fetchRecipeRatings(recipeId))
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Gagal mengambil data:', error)
       }
     }
 
     fetchData()
   }, [dispatch, recipeId])
 
+  /**
+   * Periksa apakah pengguna adalah pemilik resep
+   * @returns {boolean} Status kepemilikan resep
+   */
   const checkIsRecipeOwner = () => {
     return authUser && recipe && authUser.id === recipe.user_id
   }
 
   const isRecipeOwner = checkIsRecipeOwner()
 
-  // Loading state
-  if (authLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    )
-  }
-  if (recipeLoading) {
+  // Tampilan loading
+  if (authLoading || recipeLoading) {
     return (
       <Box
         display="flex"
@@ -94,25 +90,52 @@ const RecipeDetailPage = () => {
     )
   }
 
-  // Fungsi untuk handle edit recipe
+  // Handler untuk edit resep
   const handleEditRecipe = () => {
     navigate(`/recipe/edit/${recipeId}`)
   }
 
+  // Handler untuk menampilkan modal hapus
   const handleDeleteRecipe = () => {
-    setShowModal(true)
+    Swal.fire({
+      title: 'Konfirmasi Hapus Resep',
+      text: 'Apakah Anda yakin ingin menghapus resep ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        confirmDelete()
+      }
+    })
   }
 
+  // Konfirmasi dan proses penghapusan resep
   const confirmDelete = async () => {
     try {
       await dispatch(deleteRecipe(recipeId))
-      setShowModal(false)
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Resep Berhasil Dihapus',
+        showConfirmButton: false,
+        timer: 1500,
+      })
+
       navigate('/recipe')
     } catch (error) {
-      console.error('Error deleting recipe:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Menghapus Resep',
+        text: error.message,
+      })
     }
   }
 
+  // Tangani error
   if (error) {
     return (
       <Typography variant="h6" color="error" align="center">
@@ -120,9 +143,13 @@ const RecipeDetailPage = () => {
       </Typography>
     )
   }
-  if (!recipe) return <div>Recipe not found</div>
+  if (!recipe) return <div>Resep tidak ditemukan</div>
 
-  // Fungsi untuk memformat ingredients dan instructions
+  /**
+   * Memformat teks menjadi daftar
+   * @param {string} text - Teks yang akan diformat
+   * @returns {string[]} Daftar item
+   */
   const formatList = (text) => {
     if (!text) return []
     return text.split('\n').filter((item) => item.trim() !== '')
@@ -130,9 +157,11 @@ const RecipeDetailPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Struktur layout detail resep */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Kolom Kiri: Detail Resep (Lebih Lebar) */}
+        {/* Kolom utama detail resep */}
         <div className="w-full md:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+          {/* Konten detail resep */}
           {/* Header Image */}
           <div className="relative group">
             <img
@@ -332,6 +361,8 @@ const RecipeDetailPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Kolom komentar */}
         <div className="w-full md:w-1/3 bg-gray-50 rounded-lg p-4 h-fit md:top-8">
           <CommentSection recipeId={recipeId} />
         </div>

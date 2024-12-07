@@ -25,7 +25,6 @@ import ProfilePictureUpload from './components/Profile/uploadProfilePict'
 import PrivateRoute from './routes/PrivateRoute'
 
 // Import Utilities
-import setupAxiosInterceptors from './utils/axiosInterceptor'
 import { verifyToken } from './redux/action/authActions'
 
 function App() {
@@ -33,7 +32,6 @@ function App() {
   const { isAuthenticated, loading } = useSelector((state) => state.auth)
 
   useEffect(() => {
-    setupAxiosInterceptors()
     dispatch(verifyToken())
   }, [dispatch])
 

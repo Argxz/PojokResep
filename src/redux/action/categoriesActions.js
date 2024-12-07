@@ -1,11 +1,8 @@
 import Swal from 'sweetalert2'
-import setupAxiosInterceptors from '../../utils/axiosInterceptor'
+import { axiosInstance } from '../../utils/axiosInterceptor'
 
 // URL basis untuk endpoint kategori dari environment variable
 const BASE_URL = import.meta.env.VITE_CATEGORY_URL
-
-// Inisialisasi axios dengan interceptor
-const axiosInstance = setupAxiosInterceptors()
 
 /**
  * Action creator untuk mengambil daftar kategori

@@ -11,7 +11,7 @@ export const ratingReducer = (state = initialState, action) => {
     case 'FETCH_RECIPE_RATINGS_SUCCESS':
       return {
         ...state,
-        ratings: action.payload, // Pastikan ini sesuai struktur data dari backend
+        ratings: action.payload,
         loading: false,
         error: null,
       }

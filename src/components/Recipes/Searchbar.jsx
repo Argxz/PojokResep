@@ -1,12 +1,20 @@
 import React, { useState, useCallback } from 'react'
+
+//Impor komponen yg diperlukan
 import { TextField, InputAdornment, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import ClearIcon from '@mui/icons-material/Clear'
 
+/**
+ * Komponen bilah pencarian resep
+ * @param {Object} props - Properti komponen
+ * @param {Function} props.onSearch - Fungsi callback untuk pencarian
+ */
 const RecipeSearchBar = ({ onSearch }) => {
+  // State untuk menyimpan kata kunci pencarian
   const [searchTerm, setSearchTerm] = useState('')
 
-  // Gunakan useCallback untuk mengoptimalkan performa
+  // Fungsi pencarian dengan optimasi menggunakan useCallback
   const handleSearch = useCallback(
     (value) => {
       onSearch(value)
@@ -14,6 +22,10 @@ const RecipeSearchBar = ({ onSearch }) => {
     [onSearch],
   )
 
+  /**
+   * Menangani perubahan input pencarian
+   * @param {Event} e - Event perubahan input
+   */
   const handleChange = (e) => {
     const value = e.target.value
     setSearchTerm(value)
@@ -21,6 +33,9 @@ const RecipeSearchBar = ({ onSearch }) => {
     handleSearch(value)
   }
 
+  /**
+   * Menangani pembersihan input pencarian
+   */
   const handleClear = () => {
     setSearchTerm('')
     handleSearch('')
@@ -35,19 +50,22 @@ const RecipeSearchBar = ({ onSearch }) => {
         value={searchTerm}
         onChange={handleChange}
         InputProps={{
+          // Ikon pencarian di awal input
           startAdornment: (
             <InputAdornment position="start">
               <SearchIcon
                 sx={{
-                  color: 'rgba(96,165,250,1)', // bright blue
+                  color: 'rgba(96,165,250,1)', // biru cerah
                   transition: 'color 0.3s ease',
                   '&:hover': {
-                    color: 'rgba(59,130,246,1)', // slightly darker blue
+                    color: 'rgba(59,130,246,1)', // biru sedikit gelap
                   },
                 }}
               />
             </InputAdornment>
           ),
+
+          // Ikon hapus di akhir input (muncul saat ada teks)
           endAdornment: searchTerm && (
             <InputAdornment position="end">
               <IconButton
@@ -66,7 +84,7 @@ const RecipeSearchBar = ({ onSearch }) => {
                 <ClearIcon
                   fontSize="small"
                   sx={{
-                    color: 'rgba(209,213,219,1)', // light gray
+                    color: 'rgba(209,213,219,1)', // abu-abu terang
                     transition: 'color 0.3s ease',
                     '&:hover': {
                       color: 'white',
@@ -76,39 +94,46 @@ const RecipeSearchBar = ({ onSearch }) => {
               </IconButton>
             </InputAdornment>
           ),
+
+          // Gaya kustom untuk input
           sx: {
             borderRadius: '16px',
             transition: 'all 0.3s ease',
-            backgroundColor: 'rgba(17,24,39,0.8)', // very dark background
+            backgroundColor: 'rgba(17,24,39,0.8)', // latar belakang gelap
 
+            // Gaya border
             '& .MuiOutlinedInput-notchedOutline': {
-              border: '1px solid rgba(75,85,99,0.7)', // dark border
+              border: '1px solid rgba(75,85,99,0.7)', // border gelap
               borderRadius: '16px',
               transition: 'all 0.3s ease',
             },
 
+            // Efek hover
             '&:hover': {
               backgroundColor: 'rgba(17,24,39,0.9)',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(96,165,250,0.5)', // bright blue
+                borderColor: 'rgba(96,165,250,0.5)', // biru cerah
               },
             },
 
+            // Gaya saat difokuskan
             '&.Mui-focused': {
-              backgroundColor: 'rgba(37,99,235,0.1)', // blue-600
+              backgroundColor: 'rgba(37,99,235,0.1)', // biru-600
 
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(96,165,250,0.8)', // bright blue
+                borderColor: 'rgba(96,165,250,0.8)', // biru cerah
                 borderWidth: '2px',
               },
             },
 
+            // Gaya teks input
             '& input': {
               padding: '12px 14px',
               fontSize: '0.95rem',
-              color: 'rgba(17,24,39,0.9)', // very light text for contrast
+              color: 'rgba(17,24,39,0.9)', // teks sangat terang untuk kontras
               transition: 'all 0.3s ease',
 
+              // Gaya placeholder
               '&::placeholder': {
                 color: 'rgba(243,244,246,1)', // Putih murni dengan opacity
                 opacity: 1, // Pastikan opacity terlihat
@@ -119,16 +144,16 @@ const RecipeSearchBar = ({ onSearch }) => {
         }}
       />
 
-      {/* Background Gradient Layer */}
+      {/* Lapisan gradient latar belakang */}
       <div
         sx={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(to right, rgba(37,99,235,0.05), rgba(59,130,246,0.03))',
+            'linear-gradient(to right, rgba(37,99,235,0.05), rgba(59,130,246,0.03))', // gradient lembut
           zIndex: -10,
           borderRadius: '16px',
-          filter: 'blur(6px)',
+          filter: 'blur(6px)', // efek blur
           opacity: 0.4,
           transition: 'all 0.3s ease',
         }}

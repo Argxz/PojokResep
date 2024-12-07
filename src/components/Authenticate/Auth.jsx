@@ -1,34 +1,51 @@
+// Impor library
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { login, register } from '../../redux/action/authActions'
 import { useNavigate } from 'react-router-dom'
 import LogoImage from '../../assets/porespth.png'
 import SmallLogo from '../../assets/pores-sm2.png'
+
+//Impor komponen yang diperlukan
 import Swal from 'sweetalert2'
 import { Mail, Lock, User, KeyRound } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const Auth = () => {
+  // State untuk mengelola formulir dan tab aktif
   const [activeTab, setActiveTab] = useState('login')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
+  // Hook untuk dispatch aksi dan navigasi
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  /**
+   * Menangani proses login
+   * @param {Event} e - Event formulir
+   */
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
+      // Dispatch aksi login
       await dispatch(login(email, password))
       navigate('/') // Redirect ke halaman utama setelah login
     } catch (error) {
       console.error('Login error:', error)
     }
   }
+
+  /**
+   * Menangani proses registrasi
+   * @param {Event} e - Event formulir
+   */
   const handleRegister = async (e) => {
     e.preventDefault()
+
+    // Validasi konfirmasi password
     if (password !== confirmPassword) {
       Swal.fire({
         title: 'Password Tidak Cocok',
@@ -40,9 +57,10 @@ const Auth = () => {
     }
 
     try {
+      // Dispatch aksi registrasi
       const result = await dispatch(register(username, email, password))
 
-      // Gunakan Sweet Alert untuk konfirmasi
+      // Tampilkan konfirmasi registrasi
       const { isConfirmed } = await Swal.fire({
         title: 'Registrasi Berhasil!',
         text: 'Apakah Anda ingin login sekarang?',
@@ -52,11 +70,9 @@ const Auth = () => {
         cancelButtonText: 'Tidak',
       })
 
-      // Hanya pindah tab jika user memilih untuk login
+      // Pindah ke tab login jika dikonfirmasi
       if (isConfirmed) {
         setActiveTab('login')
-
-        // Optional: Set email untuk login otomatis
         setEmail(email)
       }
     } catch (error) {
@@ -64,6 +80,7 @@ const Auth = () => {
     }
   }
 
+  // Variasi animasi untuk transisi formulir
   const formVariants = {
     hidden: {
       opacity: 0,
@@ -89,9 +106,10 @@ const Auth = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+      {/* Kontainer Formulir */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-10 border border-gray-100 ">
-          {/* Logo Section */}
+        <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-10 border border-gray-100">
+          {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
               src={SmallLogo}
@@ -99,6 +117,7 @@ const Auth = () => {
               className="w-20 h-20 object-contain"
             />
           </div>
+
           {/* Header */}
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-gray-900">
@@ -111,8 +130,9 @@ const Auth = () => {
             </p>
           </div>
 
-          {/* Form Container */}
+          {/* Kontainer Animasi Formulir */}
           <AnimatePresence mode="wait">
+            {/* Formulir Login */}
             {activeTab === 'login' ? (
               <motion.div
                 key="login"
@@ -122,7 +142,7 @@ const Auth = () => {
                 variants={formVariants}
               >
                 <form onSubmit={handleLogin} className="space-y-6">
-                  {/* Email Input */}
+                  {/* Input Email */}
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -135,7 +155,7 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Password Input */}
+                  {/* Input Password */}
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -148,7 +168,7 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Login Button */}
+                  {/* Tombol Login */}
                   <button
                     type="submit"
                     className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors duration-300"
@@ -158,6 +178,7 @@ const Auth = () => {
                 </form>
               </motion.div>
             ) : (
+              // Formulir Registrasi
               <motion.div
                 key="register"
                 initial="hidden"
@@ -166,7 +187,7 @@ const Auth = () => {
                 variants={formVariants}
               >
                 <form onSubmit={handleRegister} className="space-y-6">
-                  {/* Username Input */}
+                  {/* Input Username */}
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -179,7 +200,7 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Email Input */}
+                  {/* Input Email */}
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -192,7 +213,7 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Password Input */}
+                  {/* Input Password */}
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -205,12 +226,12 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Confirm Password Input */}
+                  {/* Input Konfirmasi Password */}
                   <div className="relative">
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="password"
-                      placeholder="Confirm Password"
+                      placeholder="Konfirmasi Password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
@@ -218,7 +239,7 @@ const Auth = () => {
                     />
                   </div>
 
-                  {/* Register Button */}
+                  {/* Tombol Registrasi */}
                   <button
                     type="submit"
                     className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors duration-300"
@@ -232,6 +253,7 @@ const Auth = () => {
         </div>
       </div>
 
+      {/* Gambar Latar Belakang */}
       <div
         className="hidden lg:flex w-1/2 bg-cover bg-center fixed right-0 top-0 bottom-0"
         style={{
