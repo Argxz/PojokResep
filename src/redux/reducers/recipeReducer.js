@@ -123,11 +123,12 @@ const recipeReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        recipes: action.payload.recipes, // Sesuaikan dengan struktur payload
+        recipes: action.payload.recipes || action.payload, // Antisipasi struktur berbeda
         pagination: {
-          currentPage: action.payload.currentPage,
-          totalPages: action.payload.totalPages,
-          totalRecipes: action.payload.totalRecipes,
+          currentPage: action.payload.currentPage || 1,
+          totalPages: action.payload.totalPages || 1,
+          totalRecipes:
+            action.payload.totalRecipes || action.payload.length || 0,
         },
         error: null,
       }

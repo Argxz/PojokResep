@@ -42,7 +42,10 @@ const ListRecipes = () => {
   }
 
   useEffect(() => {
-    setFilteredRecipes(recipes)
+    // Pastikan recipes sudah ada sebelum di-set
+    if (recipes && recipes.length > 0) {
+      setFilteredRecipes(recipes)
+    }
   }, [recipes])
 
   const handleRecipeClick = (recipeId) => {
@@ -50,6 +53,8 @@ const ListRecipes = () => {
   }
 
   const handleSearch = (searchTerm) => {
+    if (!recipes || recipes.length === 0) return
+
     const filtered = recipes.filter(
       (recipe) =>
         recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,11 +66,11 @@ const ListRecipes = () => {
     setFilteredRecipes(filtered)
   }
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <div></div>
   if (error) return <div>Error: {error}</div>
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl -mt-10 md:-mt-16 lg:-mt-10">
       {/* Loading overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">

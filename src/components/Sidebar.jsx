@@ -219,87 +219,88 @@ const Sidebar = () => {
 
         {/* Tombol Logout dengan konfirmasi */}
         <div className="space-y-2 relative">
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="w-full flex items-center justify-center 
-              px-4 py-3 bg-red-700 text-white rounded-lg 
-              hover:bg-red-600 transition-colors 
-              group"
-          >
-            <LogOut
-              className="w-5 h-5 mr-2 
-                group-hover:rotate-12 
-                transition-transform"
-            />
-            Log out
-          </button>
-
-          {/* Modal konfirmasi logout */}
-          {showConfirm && (
-            <div
-              className="fixed inset-0 bg-black/50 
-                flex items-center justify-center 
-                z-[100] p-4"
-              onClick={() => setShowConfirm(false)}
+          <div className="relative">
+            <button
+              onClick={() => setShowConfirm(true)}
+              className="w-full flex items-center justify-center 
+        px-4 py-3 bg-red-700 text-white rounded-lg 
+        hover:bg-red-600 transition-colors 
+        group"
             >
+              <LogOut
+                className="w-5 h-5 mr-2 
+          group-hover:rotate-12 
+          transition-transform"
+              />
+              Log out
+            </button>
+
+            {/* Modal konfirmasi logout */}
+            {showConfirm && (
               <div
-                className="bg-white dark:bg-gray-800 
-                  shadow-2xl rounded-2xl p-6 w-full max-w-md 
-                  animate-fade-in"
-                onClick={(e) => e.stopPropagation()}
+                className="absolute bottom-20 left-0 right-0 
+    mx-3 
+    bg-white dark:bg-gray-800 
+    shadow-2xl rounded-2xl 
+    p-4  // Kembalikan ke p-4 
+    z-50 
+    animate-fade-in 
+    border border-gray-200 dark:border-gray-700"
               >
-                <div className="flex items-center space-x-4 mb-4">
+                <div className="flex items-center space-x-3 mb-3">
                   <AlertCircle
-                    className="w-8 h-8 text-red-500 
-                      animate-pulse"
+                    className="w-6 h-6 text-red-500 
+        animate-pulse"
                   />
                   <p
-                    className="text-base text-gray-700 
-                      dark:text-gray-200 font-semibold"
+                    className="text-sm text-gray-700 
+        dark:text-gray-200 font-semibold"
                   >
-                    Anda yakin ingin logout dari aplikasi?
+                    Anda yakin ingin logout?
                   </p>
                 </div>
 
-                <div className="flex space-x-4">
+                <div className="flex space-x-3">
                   <button
                     onClick={handleLogoutConfirm}
                     className="flex-1 bg-red-500 text-white 
-                      px-4 py-3 rounded-xl 
-                      hover:bg-red-600 
-                      transition-colors 
-                      transform active:scale-95 
-                      flex items-center justify-center 
-                      space-x-3 
-                      group"
+        px-3 py-2 rounded-xl 
+        text-sm
+        hover:bg-red-600 
+        transition-colors 
+        transform active:scale-95 
+        flex items-center justify-center 
+        space-x-2 
+        group"
                   >
                     <LogOut
-                      className="w-6 h-6 
-                        group-hover:rotate-12 
-                        transition-transform"
+                      className="w-4 h-4 
+          group-hover:rotate-12 
+          transition-transform"
                     />
-                    <span className="text-base">Ya, Logout</span>
+                    <span>Logout</span>
                   </button>
 
                   <button
                     onClick={() => setShowConfirm(false)}
                     className="flex-1 bg-gray-200 
-                      dark:bg-gray-700 
-                      text-gray-700 
-                      dark:text-gray-300 
-                      px-4 py-3 
-                      rounded-xl 
-                      hover:bg-gray-300 
-                      dark:hover:bg-gray-600 
-                      transition-colors 
-                      transform active:scale-95"
+        dark:bg-gray-700 
+        text-gray-700 
+        dark:text-gray-300 
+        px-3 py-2 
+        rounded-xl 
+        text-sm
+        hover:bg-gray-300 
+        dark:hover:bg-gray-600 
+        transition-colors 
+        transform active:scale-95"
                   >
                     Batal
                   </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Copyright Section - Pengembang Web */}

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Clock, Users, ChefHat, Utensils, Edit, Trash2 } from 'lucide-react'
 import { fetchRecipeDetail, deleteRecipe } from '../redux/action/recipeActions'
 import { fetchUserProfile } from '../redux/action/userActions'
-import { fetchRecipeRatings } from '../redux/action/ratingAction'
+import { fetchRecipeRatings } from '../redux/action/ratingActions'
 import { Typography, Box, CircularProgress } from '@mui/material'
 import CommentSection from './commentSection'
 import StarRating from './starRating'
@@ -301,7 +301,7 @@ const RecipeDetailPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {formatList(recipe.ingredients).map((ingredient, index) => (
                   <div key={index} className="flex items-center">
-                    <span className="font-bold text-red-600 mr-2">♦</span>
+                    <span className="font-bold text-red-600 mr-2">▣</span>
                     <span className="font-semibold text-gray-800">
                       {ingredient}
                     </span>

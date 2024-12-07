@@ -27,39 +27,111 @@ const RecipeSearchBar = ({ onSearch }) => {
   }
 
   return (
-    <div className="mb-6 max-w-xl mx-auto">
+    <div className="mb-3 mt-1 max-w-2xl mx-auto relative">
       <TextField
         fullWidth
         variant="outlined"
         placeholder="Cari resep... (judul, kategori, pembuat)"
         value={searchTerm}
-        onChange={handleChange} // Ganti dari onKeyPress ke onChange
+        onChange={handleChange}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon className="text-gray-500" />
+              <SearchIcon
+                sx={{
+                  color: 'rgba(96,165,250,1)', // bright blue
+                  transition: 'color 0.3s ease',
+                  '&:hover': {
+                    color: 'rgba(59,130,246,1)', // slightly darker blue
+                  },
+                }}
+              />
             </InputAdornment>
           ),
           endAdornment: searchTerm && (
             <InputAdornment position="end">
-              <IconButton onClick={handleClear} edge="end" size="small">
-                <ClearIcon fontSize="small" />
+              <IconButton
+                onClick={handleClear}
+                edge="end"
+                size="small"
+                sx={{
+                  transition: 'all 0.3s ease',
+                  borderRadius: '50%',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    transform: 'scale(1.1)',
+                  },
+                }}
+              >
+                <ClearIcon
+                  fontSize="small"
+                  sx={{
+                    color: 'rgba(209,213,219,1)', // light gray
+                    transition: 'color 0.3s ease',
+                    '&:hover': {
+                      color: 'white',
+                    },
+                  }}
+                />
               </IconButton>
             </InputAdornment>
           ),
           sx: {
+            borderRadius: '16px',
+            transition: 'all 0.3s ease',
+            backgroundColor: 'rgba(17,24,39,0.8)', // very dark background
+
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(0,0,0,0.23)',
+              border: '1px solid rgba(75,85,99,0.7)', // dark border
+              borderRadius: '16px',
+              transition: 'all 0.3s ease',
             },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+
+            '&:hover': {
+              backgroundColor: 'rgba(17,24,39,0.9)',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(96,165,250,0.5)', // bright blue
+              },
             },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+
+            '&.Mui-focused': {
+              backgroundColor: 'rgba(37,99,235,0.1)', // blue-600
+
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(96,165,250,0.8)', // bright blue
+                borderWidth: '2px',
+              },
+            },
+
+            '& input': {
+              padding: '12px 14px',
+              fontSize: '0.95rem',
+              color: 'rgba(17,24,39,0.9)', // very light text for contrast
+              transition: 'all 0.3s ease',
+
+              '&::placeholder': {
+                color: 'rgba(243,244,246,1)', // Putih murni dengan opacity
+                opacity: 1, // Pastikan opacity terlihat
+                transition: 'color 0.3s ease',
+              },
             },
           },
         }}
-        className="bg-white rounded-lg shadow-sm"
+      />
+
+      {/* Background Gradient Layer */}
+      <div
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(to right, rgba(37,99,235,0.05), rgba(59,130,246,0.03))',
+          zIndex: -10,
+          borderRadius: '16px',
+          filter: 'blur(6px)',
+          opacity: 0.4,
+          transition: 'all 0.3s ease',
+        }}
       />
     </div>
   )
