@@ -1,39 +1,32 @@
 import React, { useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchAllComments,
-  deleteAdminComment,
-} from '../../redux/action/adminActions'
 import { Trash2 } from 'lucide-react'
+import {
+  fetchAllRecipes,
+  deleteAdminRecipe,
+} from '../../redux/action/adminActions'
 
-const CommentsList = () => {
+const RecipeTables = () => {
   const dispatch = useDispatch()
-  const { comments, loading, error, commentsFetched } = useSelector(
+  const { recipes, loading, error, recipesFetched } = useSelector(
     (state) => state.admin,
   )
 
-  // Memoisasi fetch comments
-  const fetchComments = useCallback(() => {
-    dispatch(fetchAllComments())
+  // Memoisasi fetch recipes
+  const fetchRecipes = useCallback(() => {
+    dispatch(fetchAllRecipes())
   }, [dispatch])
 
-  const handleDeleteComment = (commentId) => {
-    dispatch(deleteAdminComment(commentId))
+  const handleDeleteRecipe = (recipeId) => {
+    dispatch(deleteAdminRecipe(recipeId))
   }
 
   useEffect(() => {
-    if (!commentsFetched) {
-      fetchComments()
+    if (!recipesFetched) {
+      fetchRecipes()
     }
-  }, [commentsFetched, fetchComments])
+  }, [recipesFetched, fetchRecipes])
 
-  if (loading && comments.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
-      </div>
-    )
-  }
   // Fungsi untuk format tanggal
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -42,6 +35,14 @@ const CommentsList = () => {
     const year = date.getFullYear()
 
     return `${day}/${month}/${year}`
+  }
+
+  if (loading && recipes.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
+      </div>
+    )
   }
 
   if (error) {
@@ -55,9 +56,9 @@ const CommentsList = () => {
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Semua Komentar</h2>
+        <h2 className="text-2xl font-bold">Semua Resep</h2>
         <button
-          onClick={fetchComments}
+          onClick={fetchRecipes}
           className="text-blue-500 hover:text-blue-700"
           disabled={loading}
         >
@@ -65,38 +66,32 @@ const CommentsList = () => {
         </button>
       </div>
 
-      {comments.length === 0 ? (
-        <p className="text-center text-gray-500">Tidak Ada Komentar</p>
+      {recipes.length === 0 ? (
+        <p className="text-center text-gray-500">Tidak Ada Resep</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-100">
-                <th className="py-2 px-4 text-left">User</th>
-                <th className="py-2 px-4 text-left">Resep</th>
-                <th className="py-2 px-4 text-left">Komentar</th>
-                <th className="py-2 px-4 text-left">Tanggal</th>
+                <th className="py-2 px-4 text-left">Judul</th>
+                <th className="py-2 px-4 text-left">Penulis</th>
+                <th className="py-2 px-4 text-left">Tanggal Dibuat</th>
                 <th className="py-2 px-4 text-left">Aksi</th>
               </tr>
             </thead>
             <tbody>
-              {comments.map((comment) => (
-                <tr key={comment.id} className="border-b hover:bg-gray-50">
+              {recipes.map((recipe) => (
+                <tr key={recipe.id} className="border-b hover:bg-gray-50">
+                  <td className="py-2 px-4">{recipe.title}</td>
                   <td className="py-2 px-4">
-                    {comment.user?.username || 'Anonymous'}
+                    {recipe.user?.username || 'Anonymous'}
                   </td>
-                  <td className="py-2 px-4">
-                    {comment.recipe?.title || 'Deleted Recipe'}
-                  </td>
-                  <td className="py-2 px-4 truncate max-w-xs">
-                    {comment.content}
-                  </td>
-                  <td className="py-2 px-4">{formatDate(comment.createdAt)}</td>
+                  <td className="py-2 px-4">{formatDate(recipe.createdAt)}</td>
                   <td className="py-2 px-4">
                     <button
-                      onClick={() => handleDeleteComment(comment.id)}
+                      onClick={() => handleDeleteRecipe(recipe.id)}
                       className="text-red-500 hover:text-red-700 transition-colors"
-                      title="Delete Comment"
+                      title="Delete Recipe"
                     >
                       <Trash2 size={20} />
                     </button>
@@ -111,4 +106,4 @@ const CommentsList = () => {
   )
 }
 
-export default CommentsList
+export default RecipeTables

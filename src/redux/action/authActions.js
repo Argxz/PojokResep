@@ -74,12 +74,6 @@ export const login = (email, password) => async (dispatch) => {
 
     return response.data.data
   } catch (error) {
-    console.log('Full Login Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    })
-
     let errorMessage = 'Login Gagal'
     let errorTitle = 'Login Gagal'
 
@@ -174,8 +168,6 @@ export const logoutUser = () => async (dispatch) => {
     // Dispatch logout
     dispatch({ type: 'LOGOUT' })
   } catch (error) {
-    console.error('Logout error:', error)
-
     // Tetap lakukan logout lokal jika request gagal
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
@@ -258,7 +250,6 @@ export const verifyToken = () => async (dispatch) => {
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
     return false
   } catch (error) {
-    console.error('Verify Token Error:', error)
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
     return false
   }
@@ -290,7 +281,7 @@ export const register = (username, email, password) => async (dispatch) => {
     Swal.fire({
       icon: 'error',
       title: 'Validasi Gagal',
-      text: 'Password harus mengandung huruf dan angka',
+      text: 'Password harus mengandung huruf minimal 8 karakter dan angka',
     })
     throw new Error('Password tidak memenuhi kriteria')
   }
@@ -305,13 +296,6 @@ export const register = (username, email, password) => async (dispatch) => {
     // Kembalikan data user
     return response.data.data
   } catch (error) {
-    // Logging error secara detail
-    console.error('Registration Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    })
-
     // Tangani berbagai jenis error dengan Swal
     if (error.response) {
       switch (error.response.status) {

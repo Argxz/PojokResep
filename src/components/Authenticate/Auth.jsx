@@ -33,9 +33,7 @@ const Auth = () => {
       // Dispatch aksi login
       await dispatch(login(email, password))
       navigate('/') // Redirect ke halaman utama setelah login
-    } catch (error) {
-      console.error('Login error:', error)
-    }
+    } catch (error) {}
   }
 
   /**
@@ -75,9 +73,7 @@ const Auth = () => {
         setActiveTab('login')
         setEmail(email)
       }
-    } catch (error) {
-      console.error('Register error:', error)
-    }
+    } catch (error) {}
   }
 
   // Variasi animasi untuk transisi formulir
@@ -188,42 +184,243 @@ const Auth = () => {
               >
                 <form onSubmit={handleRegister} className="space-y-6">
                   {/* Input Username */}
-                  <div className="relative">
+                  <div className="relative group">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <div
+                      className="absolute z-10 w-64 p-4 -top-36 left-0 
+    transform transition-all duration-300 ease-in-out 
+    origin-bottom-left 
+    scale-0 group-focus-within:scale-100 
+    bg-white 
+    border border-gray-200 
+    rounded-xl 
+    shadow-2xl 
+    overflow-hidden"
+                    >
+                      <div
+                        className="absolute bottom-0 left-5 w-4 h-4 
+      bg-white 
+      border-r border-b 
+      border-gray-200 
+      transform rotate-45 
+      -translate-y-1/2"
+                      ></div>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                        Username Guidelines
+                      </h4>
+                      <ul className="space-y-1 text-xs text-gray-600">
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Minimal 3 karakter
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Tanpa spasi
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Huruf & angka saja
+                        </li>
+                      </ul>
+                    </div>
                   </div>
 
                   {/* Input Email */}
-                  <div className="relative">
+                  <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="email"
                       placeholder="Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <div
+                      className="absolute z-10 w-64 p-4 -top-36 left-0 
+    transform transition-all duration-300 ease-in-out 
+    origin-bottom-left 
+    scale-0 group-focus-within:scale-100 
+    bg-white 
+    border border-gray-200 
+    rounded-xl 
+    shadow-2xl 
+    overflow-hidden"
+                    >
+                      <div
+                        className="absolute bottom-0 left-5 w-4 h-4 
+      bg-white 
+      border-r border-b 
+      border-gray-200 
+      transform rotate-45 
+      -translate-y-1/2"
+                      ></div>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                        Email Guidelines
+                      </h4>
+                      <ul className="space-y-1 text-xs text-gray-600">
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Format email valid
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Contoh: nama@example.com
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Domain harus valid
+                        </li>
+                      </ul>
+                    </div>
                   </div>
 
                   {/* Input Password */}
-                  <div className="relative">
+                  <div className="relative group">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="password"
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    <div
+                      className="absolute z-10 w-64 p-4 -top-44 left-0 
+    transform transition-all duration-300 ease-in-out 
+    origin-bottom-left 
+    scale-0 group-focus-within:scale-100 
+    bg-white 
+    border border-gray-200 
+    rounded-xl 
+    shadow-2xl 
+    overflow-hidden"
+                    >
+                      <div
+                        className="absolute bottom-0 left-5 w-4 h-4 
+      bg-white 
+      border-r border-b 
+      border-gray-200 
+      transform rotate-45 
+      -translate-y-1/2"
+                      ></div>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                        Password Guidelines
+                      </h4>
+                      <ul className="space-y-1 text-xs text-gray-600">
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Minimal 8 karakter
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Kombinasi huruf & angka
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2 text-green-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Disarankan simbol unik
+                        </li>
+                      </ul>
+                    </div>
                   </div>
 
                   {/* Input Konfirmasi Password */}

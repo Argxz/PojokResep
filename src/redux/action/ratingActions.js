@@ -70,17 +70,14 @@ export const submitRating = (recipeId, value) => async (dispatch, getState) => {
 export const fetchUserRatingForRecipe =
   (recipeId) => async (dispatch, getState) => {
     try {
-      // Ambil token otentikasi dari state
       const { auth } = getState()
 
-      // Kirim permintaan GET untuk rating pengguna
       const response = await axiosInstance.get(`${BASE_URL}/user/${recipeId}`, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
       })
 
-      // Dispatch aksi sukses dengan rating pengguna
       dispatch({
         type: 'FETCH_USER_RATING_SUCCESS',
         payload: {
@@ -90,24 +87,14 @@ export const fetchUserRatingForRecipe =
 
       return response.data
     } catch (error) {
-      // Tangani kasus khusus untuk rating yang belum ada (404)
-      if (error.response && error.response.status === 404) {
-        dispatch({
-          type: 'FETCH_USER_RATING_SUCCESS',
-          payload: {
-            userRating: null,
-          },
-        })
-        return { userRating: null }
-      }
-
-      // Tampilkan pesan error untuk kesalahan lainnya
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal Mengambil Rating',
-        text: error.response?.data?.error || 'Terjadi kesalahan',
+      dispatch({
+        type: 'FETCH_USER_RATING_SUCCESS',
+        payload: {
+          userRating: null,
+        },
       })
-      throw error
+
+      return { userRating: null }
     }
   }
 

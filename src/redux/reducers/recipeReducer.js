@@ -123,12 +123,16 @@ const recipeReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        recipes: action.payload.recipes || action.payload,
+        recipes: Array.isArray(action.payload)
+          ? action.payload
+          : action.payload.recipes || action.payload.data || [],
         pagination: {
           currentPage: action.payload.currentPage || 1,
           totalPages: action.payload.totalPages || 1,
           totalRecipes:
-            action.payload.totalRecipes || action.payload.length || 0,
+            action.payload.totalRecipes ||
+            (Array.isArray(action.payload) ? action.payload.length : 0),
+          limit: action.payload.limit || 8,
         },
         error: null,
       }

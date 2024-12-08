@@ -273,7 +273,7 @@ export const fetchUserRecipes = () => async (dispatch, getState) => {
       // Jika 404, dispatch dengan payload kosong tanpa log
       dispatch({
         type: 'FETCH_USER_RECIPES_SUCCESS',
-        payload: [], // Kirim array kosong
+        payload: response.data || [],
       })
       return
     }
