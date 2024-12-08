@@ -253,7 +253,7 @@ export const fetchUserRecipes = () => async (dispatch, getState) => {
   try {
     // Ambil token otentikasi dan ID pengguna dari state
     const { auth } = getState()
-    const userId = auth.user?.id // Tambah optional chaining
+    const userId = auth.user?.id
 
     // Kirim permintaan GET untuk mengambil resep pengguna
     const response = await axiosInstance.get(`${BASE_URL}/user/${userId}`, {
@@ -268,7 +268,17 @@ export const fetchUserRecipes = () => async (dispatch, getState) => {
       payload: response.data,
     })
   } catch (error) {
-    // Log error untuk debugging
+    // Cek spesifik status 404
+    if (error.response && error.response.status === 404) {
+      // Jika 404, dispatch dengan payload kosong tanpa log
+      dispatch({
+        type: 'FETCH_USER_RECIPES_SUCCESS',
+        payload: [], // Kirim array kosong
+      })
+      return
+    }
+
+    // Untuk error lain, log dan dispatch
     console.error('Error fetching user recipes:', error)
     // Dispatch aksi gagal jika terjadi kesalahan
     dispatch({

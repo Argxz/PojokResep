@@ -13,7 +13,10 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload.user,
+        user: {
+          ...action.payload.user,
+          roles: action.payload.user.roles,
+        },
         accessToken: action.payload.accessToken,
         refreshToken: action.payload.refreshToken,
         error: null,
@@ -55,7 +58,10 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload.user,
+        user: {
+          ...action.payload.user,
+          roles: action.payload.user.roles || 'user',
+        },
         accessToken: action.payload.accessToken,
         refreshToken: action.payload.refreshToken,
         loading: false,

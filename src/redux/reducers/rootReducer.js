@@ -6,6 +6,7 @@ import userReducer from './userReducer'
 import { commentReducer } from './commentReducer'
 import { ratingReducer } from './ratingReducer'
 import categoriesReducer from './categoriesReducer'
+import adminReducer from './adminReducer'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   comment: commentReducer,
   rating: ratingReducer,
   categories: categoriesReducer,
+  admin: adminReducer,
 })
 
 export default rootReducer

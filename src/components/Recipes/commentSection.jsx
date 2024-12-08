@@ -120,7 +120,7 @@ const CommentSection = ({ recipeId }) => {
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteComment(commentId))
+        dispatch(deleteComment(commentId, false))
       }
     })
   }

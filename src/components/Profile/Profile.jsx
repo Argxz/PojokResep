@@ -24,11 +24,6 @@ const Profile = () => {
   // Destructuring state dari Redux
   const { profile, loading, error } = useSelector((state) => state.user)
 
-  // Effect untuk logging profil (bisa dihapus di production)
-  useEffect(() => {
-    console.log('Profile Data:', profile)
-  }, [profile])
-
   // Effect untuk fetch profil pengguna saat komponen dimuat
   useEffect(() => {
     dispatch(fetchUserProfile())

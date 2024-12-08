@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   Navigate,
+  useLocation,
 } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -16,6 +17,7 @@ import RecipeList from './pages/recipeList'
 import RecipeDetailPage from './pages/recipeDetailPage'
 import UserRecipes from './pages/userRecipes'
 import UpdateRecipe from './pages/updateRecipePage'
+import AdminDashboard from './pages/adminDashboard'
 
 // Import Components
 import Sidebar from './components/Sidebar'
@@ -23,13 +25,15 @@ import ProfilePictureUpload from './components/Profile/uploadProfilePict'
 
 //Import Routes
 import PrivateRoute from './routes/PrivateRoute'
+import AdminRoute from './routes/AdminRoute'
 
 // Import Utilities
 import { verifyToken } from './redux/action/authActions'
 
 function App() {
   const dispatch = useDispatch()
-  const { isAuthenticated, loading } = useSelector((state) => state.auth)
+  const { isAuthenticated, loading, user } = useSelector((state) => state.auth)
+  const location = useLocation()
 
   useEffect(() => {
     dispatch(verifyToken())
@@ -39,54 +43,89 @@ function App() {
     return <div>Loading...</div>
   }
 
+  // Cek apakah sedang di halaman admin
+  const isAdminPage = location.pathname.startsWith('/admin')
+
   return (
-    <Router>
-      <div className="flex">
-        {isAuthenticated && <Sidebar />}
+    <div className="flex">
+      {isAuthenticated && user?.roles !== 'admin' && <Sidebar />}
 
-        <div
-          className={`
-            flex-1 
-            ${isAuthenticated ? 'ml-60' : ''} 
-            p-4 
-            overflow-y-auto 
-            h-screen
-          `}
-        >
-          <Routes>
-            {/* Authentication Route */}
+      <div
+        className={`
+          flex-1 
+          ${isAuthenticated && user?.roles !== 'admin' ? 'ml-60' : ''} 
+          p-4 
+          overflow-y-auto 
+          h-screen
+        `}
+      >
+        <Routes>
+          {/* Authentication Route */}
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                user?.roles === 'admin' ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              ) : (
+                <Auth />
+              )
+            }
+          />
+
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute />}>
             <Route
-              path="/login"
-              element={isAuthenticated ? <Navigate to="/" replace /> : <Auth />}
-            />
-
-            {/* Protected Routes */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/recipe" element={<RecipeList />} />
-              <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
-              <Route path="/recipe/user/:userId" element={<UserRecipes />} />
-              <Route path="/upload-recipe" element={<CreateRecipe />} />
-              <Route path="/recipe/edit/:recipeId" element={<UpdateRecipe />} />
-              <Route
-                path="/upload-picture"
-                element={<ProfilePictureUpload />}
-              />
-            </Route>
-
-            {/* Catch-all Route */}
-            <Route
-              path="*"
+              path="/"
               element={
-                <Navigate to={isAuthenticated ? '/' : '/login'} replace />
+                user?.roles === 'admin' ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <LandingPage />
+                )
               }
             />
-          </Routes>
-        </div>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/recipe" element={<RecipeList />} />
+            <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
+            <Route path="/recipe/user/:userId" element={<UserRecipes />} />
+            <Route path="/upload-recipe" element={<CreateRecipe />} />
+            <Route path="/recipe/edit/:recipeId" element={<UpdateRecipe />} />
+            <Route path="/upload-picture" element={<ProfilePictureUpload />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+
+          {/* Catch-all Route */}
+          <Route
+            path="*"
+            element={
+              isAuthenticated ? (
+                user?.roles === 'admin' ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+        </Routes>
       </div>
-    </Router>
+    </div>
   )
 }
 
-export default App
+// Wrap App dengan Router di file yang memanggil App
+export default () => (
+  <Router>
+    <App />
+  </Router>
+)

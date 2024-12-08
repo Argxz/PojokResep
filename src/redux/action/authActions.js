@@ -41,19 +41,25 @@ export const login = (email, password) => async (dispatch) => {
       password,
     })
 
+    // Pastikan akses roles dengan benar
+    const roles = response.data.data.roles || response.data.roles
     const { accessToken, refreshToken } = response.data.data
 
     // Dispatch login success
     dispatch({
       type: 'LOGIN_SUCCESS',
       payload: {
-        user: response.data.data,
-        accessToken,
-        refreshToken,
+        user: {
+          ...response.data.data,
+          roles,
+        },
+        accessToken: response.data.data.accessToken,
+        refreshToken: response.data.data.refreshToken,
       },
     })
 
-    // Simpan token di localStorage
+    // Simpan roles di localStorage juga
+    localStorage.setItem('userRoles', response.data.data.roles)
     localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
 
@@ -190,27 +196,33 @@ export const logoutUser = () => async (dispatch) => {
 
 // Action Verifikasi Token
 export const verifyToken = () => async (dispatch) => {
-  dispatch({ type: 'VERIFY_TOKEN_REQUEST' })
-
   const accessToken = localStorage.getItem('accessToken')
   const refreshToken = localStorage.getItem('refreshToken')
+  const storedRoles = localStorage.getItem('userRoles')
+
+  dispatch({ type: 'VERIFY_TOKEN_REQUEST' })
 
   if (!accessToken || !refreshToken) {
+    // Hanya dispatch failure tanpa logout langsung
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
-    return
+    return false
   }
 
   try {
-    // Verifikasi access token
     const response = await axios.get(`${BASE_URL}/verify-token`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
 
     if (response.data.valid) {
+      const userWithRoles = {
+        ...response.data.user,
+        roles: storedRoles || 'user',
+      }
+
       dispatch({
         type: 'VERIFY_TOKEN_SUCCESS',
         payload: {
-          user: response.data.user,
+          user: userWithRoles,
           accessToken,
           refreshToken,
         },
@@ -218,27 +230,36 @@ export const verifyToken = () => async (dispatch) => {
       return true
     }
 
-    // Jika token expired, coba refresh
+    // Jika tidak valid, coba refresh token
     const refreshResponse = await dispatch(refreshTokenAction(refreshToken))
 
-    // Verifikasi ulang token baru
-    const newVerifyResponse = await axios.get(`${BASE_URL}/verify-token`, {
-      headers: { Authorization: `Bearer ${refreshResponse.accessToken}` },
-    })
+    if (refreshResponse) {
+      const newVerifyResponse = await axios.get(`${BASE_URL}/verify-token`, {
+        headers: { Authorization: `Bearer ${refreshResponse.accessToken}` },
+      })
 
-    dispatch({
-      type: 'VERIFY_TOKEN_SUCCESS',
-      payload: {
-        user: newVerifyResponse.data.user,
-        accessToken: refreshResponse.accessToken,
-        refreshToken: refreshResponse.refreshToken,
-      },
-    })
+      const userWithRoles = {
+        ...newVerifyResponse.data.user,
+        roles: storedRoles || 'user',
+      }
 
-    return true
-  } catch (error) {
+      dispatch({
+        type: 'VERIFY_TOKEN_SUCCESS',
+        payload: {
+          user: userWithRoles,
+          accessToken: refreshResponse.accessToken,
+          refreshToken: refreshResponse.refreshToken,
+        },
+      })
+      return true
+    }
+
+    // Jika refresh token gagal
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
-    dispatch(logoutUser())
+    return false
+  } catch (error) {
+    console.error('Verify Token Error:', error)
+    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
     return false
   }
 }

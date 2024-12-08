@@ -34,7 +34,7 @@ export const commentReducer = (state = initialState, action) => {
     case 'DELETE_COMMENT_SUCCESS':
       return {
         ...state,
-        comments: state.comments.filter(
+        comments: (state.comments || []).filter(
           (comment) => comment.id !== action.payload,
         ),
       }
