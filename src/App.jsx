@@ -17,7 +17,7 @@ import RecipeList from './pages/recipeList'
 import RecipeDetailPage from './pages/recipeDetailPage'
 import UserRecipes from './pages/userRecipes'
 import UpdateRecipe from './pages/updateRecipePage'
-import AdminDashboard from './pages/adminDashboard'
+import AdminDashboard from './pages/AdminDashboard'
 
 // Import Components
 import Sidebar from './components/Sidebar'
