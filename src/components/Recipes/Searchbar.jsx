@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 
 //Impor komponen yg diperlukan
 import { TextField, InputAdornment, IconButton } from '@mui/material'
@@ -13,6 +13,11 @@ import ClearIcon from '@mui/icons-material/Clear'
 const RecipeSearchBar = ({ onSearch }) => {
   // State untuk menyimpan kata kunci pencarian
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Efek untuk memanggil onSearch saat komponen pertama kali render
+  useEffect(() => {
+    onSearch(searchTerm)
+  }, [])
 
   // Fungsi pencarian dengan optimasi menggunakan useCallback
   const handleSearch = useCallback(
@@ -54,6 +59,7 @@ const RecipeSearchBar = ({ onSearch }) => {
           startAdornment: (
             <InputAdornment position="start">
               <SearchIcon
+                data-testid="SearchIcon"
                 sx={{
                   color: 'rgba(96,165,250,1)', // biru cerah
                   transition: 'color 0.3s ease',
@@ -82,6 +88,7 @@ const RecipeSearchBar = ({ onSearch }) => {
                 }}
               >
                 <ClearIcon
+                  data-testid="ClearIcon"
                   fontSize="small"
                   sx={{
                     color: 'rgba(209,213,219,1)', // abu-abu terang
