@@ -75,7 +75,6 @@ const CommentsList = () => {
                 <th className="py-2 px-4 text-left">User</th>
                 <th className="py-2 px-4 text-left">Resep</th>
                 <th className="py-2 px-4 text-left">Komentar</th>
-                <th className="py-2 px-4 text-left">Tanggal</th>
                 <th className="py-2 px-4 text-left">Aksi</th>
               </tr>
             </thead>
@@ -91,7 +90,6 @@ const CommentsList = () => {
                   <td className="py-2 px-4 truncate max-w-xs">
                     {comment.content}
                   </td>
-                  <td className="py-2 px-4">{formatDate(comment.createdAt)}</td>
                   <td className="py-2 px-4">
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
