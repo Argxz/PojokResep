@@ -104,27 +104,21 @@ export const fetchUserRatingForRecipe =
  */
 export const fetchRecipeRatings = (recipeId) => async (dispatch) => {
   try {
-    // Kirim permintaan GET untuk rating resep
     const response = await axiosInstance.get(`${BASE_URL}/recipes/${recipeId}`)
 
-    // Dispatch aksi sukses dengan data rating
+    const ratings = response.data.data || []
     dispatch({
       type: 'FETCH_RECIPE_RATINGS_SUCCESS',
-      payload: response.data,
+      payload: ratings,
     })
   } catch (error) {
-    // Tangani kasus khusus untuk rating yang belum ada (404)
+    console.error('Error fetching recipe ratings:', error)
     if (error.response && error.response.status === 404) {
       dispatch({
         type: 'FETCH_RECIPE_RATINGS_SUCCESS',
-        payload: {
-          ratings: [],
-          averageRating: 0,
-          message: 'Belum ada rating',
-        },
+        payload: [],
       })
     } else {
-      // Dispatch aksi gagal untuk kesalahan lainnya
       dispatch({
         type: 'FETCH_RECIPE_RATINGS_FAILURE',
         payload: error.response?.data?.error || 'Gagal mengambil rating',

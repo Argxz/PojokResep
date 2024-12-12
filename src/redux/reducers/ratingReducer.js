@@ -11,7 +11,7 @@ export const ratingReducer = (state = initialState, action) => {
     case 'FETCH_RECIPE_RATINGS_SUCCESS':
       return {
         ...state,
-        ratings: action.payload,
+        ratings: Array.isArray(action.payload) ? action.payload : [],
         loading: false,
         error: null,
       }
