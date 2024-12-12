@@ -128,25 +128,43 @@ export const refreshTokenAction = (refreshToken) => async (dispatch) => {
       refreshToken,
     })
 
-    const { accessToken, refreshToken: newRefreshToken } = response.data
+    // Pastikan response memiliki data yang valid
+    if (
+      response.data.valid &&
+      response.data.accessToken &&
+      response.data.refreshToken
+    ) {
+      const { accessToken, refreshToken: newRefreshToken } = response.data
 
-    // Update token di localStorage
-    localStorage.setItem('accessToken', accessToken)
-    localStorage.setItem('refreshToken', newRefreshToken)
+      // Update token di localStorage
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', newRefreshToken)
 
-    // Dispatch refresh token success
-    dispatch({
-      type: 'REFRESH_TOKEN',
-      payload: {
-        accessToken,
-        refreshToken: newRefreshToken,
-      },
-    })
+      // Dispatch refresh token success
+      dispatch({
+        type: 'REFRESH_TOKEN',
+        payload: {
+          accessToken,
+          refreshToken: newRefreshToken,
+        },
+      })
 
-    return { accessToken, refreshToken: newRefreshToken }
+      return { accessToken, refreshToken: newRefreshToken }
+    } else {
+      // Jika response tidak valid, lempar error
+      throw new Error('Invalid token response')
+    }
   } catch (error) {
-    // Jika refresh token gagal, logout paksa
+    console.error('Refresh Token Error:', error)
+
+    // Logout paksa
     dispatch(logoutUser())
+
+    // Hapus semua token dari localStorage
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userRoles')
+
     throw error
   }
 }
@@ -195,7 +213,6 @@ export const verifyToken = () => async (dispatch) => {
   dispatch({ type: 'VERIFY_TOKEN_REQUEST' })
 
   if (!accessToken || !refreshToken) {
-    // Hanya dispatch failure tanpa logout langsung
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
     return false
   }
@@ -205,6 +222,7 @@ export const verifyToken = () => async (dispatch) => {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
 
+    // Langsung return true jika valid
     if (response.data.valid) {
       const userWithRoles = {
         ...response.data.user,
@@ -223,34 +241,60 @@ export const verifyToken = () => async (dispatch) => {
     }
 
     // Jika tidak valid, coba refresh token
-    const refreshResponse = await dispatch(refreshTokenAction(refreshToken))
+    try {
+      const refreshResponse = await dispatch(refreshTokenAction(refreshToken))
 
-    if (refreshResponse) {
-      const newVerifyResponse = await axios.get(`${BASE_URL}/verify-token`, {
-        headers: { Authorization: `Bearer ${refreshResponse.accessToken}` },
-      })
+      if (refreshResponse) {
+        const newVerifyResponse = await axios.get(`${BASE_URL}/verify-token`, {
+          headers: { Authorization: `Bearer ${refreshResponse.accessToken}` },
+        })
 
-      const userWithRoles = {
-        ...newVerifyResponse.data.user,
-        roles: storedRoles || 'user',
+        if (newVerifyResponse.data.valid) {
+          const userWithRoles = {
+            ...newVerifyResponse.data.user,
+            roles: storedRoles || 'user',
+          }
+
+          dispatch({
+            type: 'VERIFY_TOKEN_SUCCESS',
+            payload: {
+              user: userWithRoles,
+              accessToken: refreshResponse.accessToken,
+              refreshToken: refreshResponse.refreshToken,
+            },
+          })
+          return true
+        }
       }
-
-      dispatch({
-        type: 'VERIFY_TOKEN_SUCCESS',
-        payload: {
-          user: userWithRoles,
-          accessToken: refreshResponse.accessToken,
-          refreshToken: refreshResponse.refreshToken,
-        },
-      })
-      return true
+    } catch (refreshError) {
+      console.error('Refresh Token Failed:', refreshError)
     }
 
     // Jika refresh token gagal
     dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
+
+    // Hapus token dari localStorage
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userRoles')
+
     return false
   } catch (error) {
-    dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
+    console.error(
+      'Verify Token Error:',
+      error.response ? error.response.data : error.message,
+    )
+
+    // Tambahkan penanganan spesifik untuk error 401
+    if (error.response && error.response.status === 401) {
+      dispatch({ type: 'VERIFY_TOKEN_FAILURE' })
+
+      // Hapus token dari localStorage
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('userRoles')
+    }
+
     return false
   }
 }

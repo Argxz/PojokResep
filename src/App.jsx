@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   Navigate,
+  useNavigate,
   useLocation,
 } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -32,12 +33,24 @@ import { verifyToken } from './redux/action/authActions'
 
 function App() {
   const dispatch = useDispatch()
-  const { isAuthenticated, loading, user } = useSelector((state) => state.auth)
+  const navigate = useNavigate()
   const location = useLocation()
+  const { isAuthenticated, loading, user } = useSelector((state) => state.auth)
 
   useEffect(() => {
-    dispatch(verifyToken())
-  }, [dispatch])
+    const checkToken = async () => {
+      // Jangan verify token di halaman login
+      if (location.pathname === '/login') return
+
+      const result = await dispatch(verifyToken())
+      if (!result) {
+        // Redirect ke login jika token invalid
+        navigate('/login')
+      }
+    }
+
+    checkToken()
+  }, [dispatch, navigate, location.pathname])
 
   if (loading) {
     return <div>Loading...</div>
