@@ -20,6 +20,7 @@ import CommentsList from '../components/Admin/CommentList'
 import RecipeTables from '../components/Admin/recipeTable'
 import UserModal from '../components/Admin/UserModal'
 
+// Component for individual dashboard cards
 const DashboardCard = ({ icon, title, value, bgColor, trend, onClick }) => (
   <div
     onClick={onClick}
@@ -77,20 +78,24 @@ const AdminDashboard = () => {
   )
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
+  // Fetch dashboard data on component mount
   useEffect(() => {
     dispatch(fetchDashboardData())
   }, [dispatch])
 
+  // Handle click on the user card
   const handleUserCardClick = () => {
     dispatch(fetchAllUsers())
     dispatch(openUserModal())
   }
 
+  // Handle logout action
   const handleLogout = () => {
     dispatch(logoutUser())
     setShowLogoutConfirm(false)
   }
 
+  // Render loading screen if data is still loading
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-blue-100">
@@ -102,6 +107,7 @@ const AdminDashboard = () => {
     )
   }
 
+  // Render error screen if there's an error
   if (error) {
     return (
       <div className="bg-gradient-to-br from-red-50 to-red-100 h-screen flex flex-col justify-center items-center">
@@ -118,7 +124,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="container mx-auto">
-        {/* Header */}
+        {/* Header Section */}
         <div className="flex justify-between items-center mb-10">
           <div className="flex items-center space-x-4">
             <div className="bg-blue-100 p-3 rounded-full">
@@ -168,10 +174,10 @@ const AdminDashboard = () => {
             value={dashboardData.totalUsers}
             bgColor="bg-blue-500"
             trend={15}
-            onClick={handleUserCardClick} // Tambahkan prop onClick
+            onClick={handleUserCardClick}
           />
 
-          {/* Tambahkan kondisi render modal */}
+          {/* Render User Modal if open */}
           {userModalOpen && <UserModal />}
           <DashboardCard
             icon={<BookOpen className="w-7 h-7 text-white" />}
@@ -196,13 +202,13 @@ const AdminDashboard = () => {
           />
         </div>
 
-        {/* Sections */}
+        {/* Main Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <CommentsList />
           <RecipeTables />
         </div>
 
-        {/* Logout Modal */}
+        {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-10 text-center">
