@@ -69,13 +69,31 @@ Pastikan Anda telah menginstal hal-hal berikut di sistem Anda:
    npm install
    ```
 
-4. Jalankan server pengembangan:
+4. Konfigurasikan file lingkungan (.env):
+
+   - Buat file `.env` di direktori utama proyek.
+   - Salin dan tempel konfigurasi berikut ke dalam file `.env`:
+
+     ```env
+     VITE_USER_URL=http://localhost:3001/api/v1/users
+     VITE_COMMENT_URL=http://localhost:3001/api/v1/comments
+     VITE_RATING_URL=http://localhost:3001/api/v1/ratings
+     VITE_RECIPE_URL=http://localhost:3001/api/v1/recipes
+     VITE_CATEGORY_URL=http://localhost:3001/api/v1/categories
+
+     VITE_BASE_URL=http://localhost:3001/api/v1
+     VITE_ADMIN_URL=http://localhost:3001/api/v1/admin
+
+     VITE_REFRESH_TOKEN_ENDPOINT=/users/refresh-token
+     ```
+
+5. Jalankan server pengembangan:
 
    ```bash
    npm run dev
    ```
 
-5. Buka browser Anda dan akses [http://localhost:5173](http://localhost:5173) untuk melihat proyek.
+6. Buka browser Anda dan akses [http://localhost:5173](http://localhost:5173) untuk melihat proyek.
 
 ---
 
